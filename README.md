@@ -1,1 +1,1 @@
-# projekt-c-rubik-s-cube
+# Rubik-Cube-CPP
