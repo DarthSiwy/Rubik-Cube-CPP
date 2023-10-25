@@ -1,0 +1,3 @@
+C:\Users\Piotr\source\repos\RubikCube\x64\Debug\RubikCube.exe
+C:\Users\Piotr\source\repos\RubikCube - Victor Gordan\x64\Debug\RubikCube.exe
+C:\repos\RubikCube\x64\Debug\RubikCube.exe
