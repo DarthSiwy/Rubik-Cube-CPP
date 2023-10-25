@@ -1,3 +1,0 @@
-﻿C:\Program Files\Microsoft Visual Studio\2022\Community\MSBuild\Microsoft\VC\v170\Microsoft.CppBuild.targets(531,5): warning MSB8028: The intermediate directory (Debug\) contains files shared from another project (rubikcube0.vcxproj).  This can lead to incorrect clean and rebuild behavior.
-  main.cpp
-  rubikcube0.vcxproj -> C:\Users\Piotr\source\repos\rubikcube0\Debug\RubikCube.exe
