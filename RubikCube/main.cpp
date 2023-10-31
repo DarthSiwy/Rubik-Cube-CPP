@@ -13,6 +13,8 @@
 void framebuffer_size_callback(GLFWwindow* window, int width, int height);
 void processInput(GLFWwindow* window);
 
+
+
 // settings
 const unsigned int SCR_WIDTH  = 800;
 const unsigned int SCR_HEIGHT = 800;
@@ -56,6 +58,9 @@ int main()
         0, 1, 3, // first triangle
         1, 2, 3  // second triangle
     };
+
+
+
     unsigned int VBO, VAO, EBO;
     glGenVertexArrays(1, &VAO);
     glGenBuffers(1, &VBO);
@@ -118,7 +123,7 @@ int main()
         // render container
         ourShader.use();
 
-        
+        /* */
         // create transformations
         glm::mat4 trans = glm::mat4(1.0f);
         trans = glm::translate(trans, glm::vec3(0.0f, 0.0f, 0.0f));
@@ -130,7 +135,7 @@ int main()
         glUniformMatrix4fv(transformLoc, 1, GL_FALSE, glm::value_ptr(trans));
         
 
-            /*
+            /* */
         // create transformations
         glm::mat4 model = glm::mat4(1.0f); // make sure to initialize matrix to identity matrix first
         glm::mat4 view = glm::mat4(1.0f);
@@ -146,7 +151,7 @@ int main()
         glUniformMatrix4fv(viewLoc, 1, GL_FALSE, &view[0][0]);
         // note: currently we set the projection matrix each frame, but since the projection matrix rarely changes it's often best practice to set it outside the main loop only once.
         ourShader.setMat4("projection", projection);
-            */
+            
 
         glBindVertexArray(VAO);
         glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
