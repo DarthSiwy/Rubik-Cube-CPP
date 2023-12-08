@@ -23,10 +23,6 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <None Include="shader_vs" />
-    <None Include="shader_fs" />
-  </ItemGroup>
-  <ItemGroup>
     <ClInclude Include="stb_image.h">
       <Filter>Header Files</Filter>
     </ClInclude>

@@ -1,14 +1,16 @@
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
 #include "stb.cpp"
-
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
 
 #include "shader_s.h"
 #include "camera.h"
+//#include "Cube.h"
 
+#include <string>
+#include <vector>
 #include <iostream>
 
 void framebuffer_size_callback(GLFWwindow* window, int width, int height);
@@ -19,16 +21,15 @@ void processInput(GLFWwindow* window);
 // settings
 const unsigned int SCR_WIDTH = 1920;
 const unsigned int SCR_HEIGHT = 1080;
-
 // camera
 Camera camera(glm::vec3(0.0f, 0.0f, 3.0f));
 float lastX = SCR_WIDTH / 2.0f;
 float lastY = SCR_HEIGHT / 2.0f;
 bool firstMouse = true;
-
 // timing
 float deltaTime = 0.0f;	// time between current frame and last frame
 float lastFrame = 0.0f;
+
 
 int main()
 {
@@ -56,90 +57,57 @@ int main()
     }
     glEnable(GL_DEPTH_TEST);
 
-    Shader ourShader("shader_vs", "shader_fs");
+    Shader ourShader("vertex_shader", "fragment_shader");
 
     float vertices[] = {
-        -0.5f, -0.5f, -0.5f,  0.0f, 0.0f,
-         0.5f, -0.5f, -0.5f,  1.0f, 0.0f,
-         0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
-         0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
-        -0.5f,  0.5f, -0.5f,  0.0f, 1.0f,
-        -0.5f, -0.5f, -0.5f,  0.0f, 0.0f,
+        //     POSITION          TEXTURE             COLOR
+        -0.5f,  0.5f, -0.5f,    0.0f, 1.0f,     1.0f, 1.0f, 1.0f,   // UP
+         0.5f,  0.5f, -0.5f,    1.0f, 1.0f,     1.0f, 1.0f, 1.0f,
+         0.5f,  0.5f,  0.5f,    1.0f, 0.0f,     1.0f, 1.0f, 1.0f,
+         0.5f,  0.5f,  0.5f,    1.0f, 0.0f,     1.0f, 1.0f, 1.0f,
+        -0.5f,  0.5f,  0.5f,    0.0f, 0.0f,     1.0f, 1.0f, 1.0f,
+        -0.5f,  0.5f, -0.5f,    0.0f, 1.0f,     1.0f, 1.0f, 1.0f,
 
-        -0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
-         0.5f, -0.5f,  0.5f,  1.0f, 0.0f,
-         0.5f,  0.5f,  0.5f,  1.0f, 1.0f,
-         0.5f,  0.5f,  0.5f,  1.0f, 1.0f,
-        -0.5f,  0.5f,  0.5f,  0.0f, 1.0f,
-        -0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
+        -0.5f, -0.5f,  0.5f,    0.0f, 0.0f,     0.0f, 1.0f, 0.0f,   // FRONT
+         0.5f, -0.5f,  0.5f,    1.0f, 0.0f,     0.0f, 1.0f, 0.0f,
+         0.5f,  0.5f,  0.5f,    1.0f, 1.0f,     0.0f, 1.0f, 0.0f,
+         0.5f,  0.5f,  0.5f,    1.0f, 1.0f,     0.0f, 1.0f, 0.0f,
+        -0.5f,  0.5f,  0.5f,    0.0f, 1.0f,     0.0f, 1.0f, 0.0f,
+        -0.5f, -0.5f,  0.5f,    0.0f, 0.0f,     0.0f, 1.0f, 0.0f,
 
-        -0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
-        -0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
-        -0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
-        -0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
-        -0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
-        -0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
+         0.5f,  0.5f,  0.5f,    1.0f, 0.0f,     1.0f, 0.0f, 0.0f,   // RIGHT
+         0.5f,  0.5f, -0.5f,    1.0f, 1.0f,     1.0f, 0.0f, 0.0f,
+         0.5f, -0.5f, -0.5f,    0.0f, 1.0f,     1.0f, 0.0f, 0.0f,
+         0.5f, -0.5f, -0.5f,    0.0f, 1.0f,     1.0f, 0.0f, 0.0f,
+         0.5f, -0.5f,  0.5f,    0.0f, 0.0f,     1.0f, 0.0f, 0.0f,
+         0.5f,  0.5f,  0.5f,    1.0f, 0.0f,     1.0f, 0.0f, 0.0f,
 
-         0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
-         0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
-         0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
-         0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
-         0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
-         0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
+        -0.5f,  0.5f,  0.5f,    1.0f, 0.0f,     1.0f, 0.5f, 0.0f,   // LEFT
+        -0.5f,  0.5f, -0.5f,    1.0f, 1.0f,     1.0f, 0.5f, 0.0f,
+        -0.5f, -0.5f, -0.5f,    0.0f, 1.0f,     1.0f, 0.5f, 0.0f,
+        -0.5f, -0.5f, -0.5f,    0.0f, 1.0f,     1.0f, 0.5f, 0.0f,
+        -0.5f, -0.5f,  0.5f,    0.0f, 0.0f,     1.0f, 0.5f, 0.0f,
+        -0.5f,  0.5f,  0.5f,    1.0f, 0.0f,     1.0f, 0.5f, 0.0f,
 
-        -0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
-         0.5f, -0.5f, -0.5f,  1.0f, 1.0f,
-         0.5f, -0.5f,  0.5f,  1.0f, 0.0f,
-         0.5f, -0.5f,  0.5f,  1.0f, 0.0f,
-        -0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
-        -0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
+        -0.5f, -0.5f, -0.5f,    0.0f, 0.0f,     0.0f, 0.0f, 1.0f,   // BACK 
+         0.5f, -0.5f, -0.5f,    1.0f, 0.0f,     0.0f, 0.0f, 1.0f,
+         0.5f,  0.5f, -0.5f,    1.0f, 1.0f,     0.0f, 0.0f, 1.0f,
+         0.5f,  0.5f, -0.5f,    1.0f, 1.0f,     0.0f, 0.0f, 1.0f,
+        -0.5f,  0.5f, -0.5f,    0.0f, 1.0f,     0.0f, 0.0f, 1.0f,
+        -0.5f, -0.5f, -0.5f,    0.0f, 0.0f,     0.0f, 0.0f, 1.0f,
 
-        -0.5f,  0.5f, -0.5f,  0.0f, 1.0f,
-         0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
-         0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
-         0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
-        -0.5f,  0.5f,  0.5f,  0.0f, 0.0f,
-        -0.5f,  0.5f, -0.5f,  0.0f, 1.0f
+        -0.5f, -0.5f, -0.5f,    0.0f, 1.0f,     1.0f, 1.0f, 0.0f,   // BOTTOM
+         0.5f, -0.5f, -0.5f,    1.0f, 1.0f,     1.0f, 1.0f, 0.0f,
+         0.5f, -0.5f,  0.5f,    1.0f, 0.0f,     1.0f, 1.0f, 0.0f,
+         0.5f, -0.5f,  0.5f,    1.0f, 0.0f,     1.0f, 1.0f, 0.0f,
+        -0.5f, -0.5f,  0.5f,    0.0f, 0.0f,     1.0f, 1.0f, 0.0f,
+        -0.5f, -0.5f, -0.5f,    0.0f, 1.0f,     1.0f, 1.0f, 0.0f      
     };
 
     glm::vec3 cubePositions[] = {
         glm::vec3(0.0f,  0.0f, 0.0f),
         glm::vec3(1.1f,  0.0f, 0.0f),
         glm::vec3(2.2f,  0.0f, 0.0f),
-
-        glm::vec3(0.0f,  1.1f, 0.0f),
-        glm::vec3(1.1f,  1.1f, 0.0f),
-        glm::vec3(2.2f,  1.1f, 0.0f),
-
-        glm::vec3(0.0f,  2.2f, 0.0f),
-        glm::vec3(1.1f,  2.2f, 0.0f),
-        glm::vec3(2.2f,  2.2f, 0.0f),
-
-        glm::vec3(0.0f,  0.0f, -1.1f),
-        glm::vec3(1.1f,  0.0f, -1.1f),
-        glm::vec3(2.2f,  0.0f, -1.1f),
-
-        glm::vec3(0.0f,  1.1f, -1.1f),
-        glm::vec3(1.1f,  1.1f, -1.1f),
-        glm::vec3(2.2f,  1.1f, -1.1f),
-
-        glm::vec3(0.0f,  2.2f, -1.1f),
-        glm::vec3(1.1f,  2.2f, -1.1f),
-        glm::vec3(2.2f,  2.2f, -1.1f),
-
-        glm::vec3(0.0f,  0.0f, -2.2f),
-        glm::vec3(1.1f,  0.0f, -2.2f),
-        glm::vec3(2.2f,  0.0f, -2.2f),
-
-        glm::vec3(0.0f,  1.1f, -2.2f),
-        glm::vec3(1.1f,  1.1f, -2.2f),
-        glm::vec3(2.2f,  1.1f, -2.2f),
-
-        glm::vec3(0.0f,  2.2f, -2.2f),
-        glm::vec3(1.1f,  2.2f, -2.2f),
-        glm::vec3(2.2f,  2.2f, -2.2f),
-
-
     };
 
     unsigned int VBO, VAO;
@@ -152,16 +120,46 @@ int main()
     glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
 
     // position attribute
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)0);
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)0);
     glEnableVertexAttribArray(0);
     // texture coord attribute
-    glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)(3 * sizeof(float)));
+    glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(3 * sizeof(float)));
     glEnableVertexAttribArray(1);
+    // texture color attribute
+    glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(5 * sizeof(float)));
+    glEnableVertexAttribArray(2);
 
+    float axisVertices[] = {
+        // X-axis
+        0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f,
+        5.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f,
+        // Y-axis
+        0.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f,
+        0.0f, 5.0f, 0.0f, 0.0f, 1.0f, 0.0f,
+        // Z-axis
+        0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f,
+        0.0f, 0.0f, 5.0f, 0.0f, 0.0f, 1.0f
+    };
+    unsigned int axisVBO, axisVAO;
+    glGenVertexArrays(1, &axisVAO);
+    glGenBuffers(1, &axisVBO);
 
-    /* */
+    glBindVertexArray(axisVAO);
+
+    glBindBuffer(GL_ARRAY_BUFFER, axisVBO);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(axisVertices), axisVertices, GL_STATIC_DRAW);
+
+    // position attribute
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)0);
+    glEnableVertexAttribArray(0);
+    // color attribute
+    glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)(3 * sizeof(float)));
+    glEnableVertexAttribArray(2);
+
     // TEXTURES
-    unsigned int texture1, walls[6];
+    unsigned int texture1, texture2;
+    unsigned char* data;
+    int width, height, nrChannels;
     
     glGenTextures(1, &texture1);
     glBindTexture(GL_TEXTURE_2D, texture1);
@@ -173,8 +171,7 @@ int main()
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 
     // load image, create texture and generate mipmaps
-    int width, height, nrChannels;
-    unsigned char* data = stbi_load("textures/rectangle.png", &width, &height, &nrChannels, 4);
+    data = stbi_load("textures/rectangle.png", &width, &height, &nrChannels, 4);
     if (data) {
         glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, data);
         glGenerateMipmap(GL_TEXTURE_2D);
@@ -184,16 +181,15 @@ int main()
     }
     stbi_image_free(data);
 
-    /**/
-    glGenTextures(1, &walls[0]);
-    glBindTexture(GL_TEXTURE_2D, walls[0]);
+    glGenTextures(1, &texture2);
+    glBindTexture(GL_TEXTURE_2D, texture2);
     // set the texture wrapping parameters
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
     // set texture filtering parameters
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-    data = stbi_load("textures/wall.png", &width, &height, &nrChannels, 4);
+    data = stbi_load("textures/wall.jpg", &width, &height, &nrChannels, 4);
     if (data) {
         glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, data);
         glGenerateMipmap(GL_TEXTURE_2D);
@@ -202,11 +198,10 @@ int main()
         std::cout << "Failed to load texture" << std::endl;
     }
     stbi_image_free(data);
-    
 
     ourShader.use();
     ourShader.setInt("texture1", 0);
-    ourShader.setInt("walls", 1);
+    ourShader.setInt("texture2", 1);
 
     
 
@@ -217,14 +212,24 @@ int main()
         lastFrame = currentFrame;
 
         processInput(window);
+        ourShader.use();
 
         glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
+        // Draw the axis lines
+        
+        glm::mat4 model = glm::mat4(1.0f);
+        ourShader.setMat4("model", model);
+
+        glBindVertexArray(axisVAO);
+        glDrawArrays(GL_LINES, 0, 6);
+
         glActiveTexture(GL_TEXTURE0);
         glBindTexture(GL_TEXTURE_2D, texture1);
+        glActiveTexture(GL_TEXTURE1);
+        glBindTexture(GL_TEXTURE_2D, texture2);
 
-        ourShader.use();
 
         glm::mat4 projection = glm::perspective(glm::radians(camera.Zoom), (float)SCR_WIDTH / (float)SCR_HEIGHT, 0.1f, 100.0f);
         ourShader.setMat4("projection", projection);
@@ -233,24 +238,23 @@ int main()
         ourShader.setMat4("view", view);
 
         glBindVertexArray(VAO);
-        for (unsigned int i = 0; i < 27; i++){
+
+        for (unsigned int i = 0; i < 1; i++){
             glm::mat4 model = glm::mat4(1.0f); 
             model = glm::translate(model, cubePositions[i]);
             float angle = 1;
-            //if (i==1) angle = 20;
+            if (i==0) angle = 0;
             model = glm::rotate(model, glm::radians(angle), glm::vec3(1.0f, 0.3f, 0.5f));
             ourShader.setMat4("model", model);
 
             glDrawArrays(GL_TRIANGLES, 0, 36);
         }
 
-        if (glfwGetKey(window, GLFW_KEY_Z) == GLFW_PRESS) {
-            cubePositions[0][2] += 1.0f;
-        }
-        if (glfwGetKey(window, GLFW_KEY_X) == GLFW_PRESS) {
-            cubePositions[0][2] -= 1.0f;
-        }
+        if (glfwGetKey(window, GLFW_KEY_Z) == GLFW_PRESS) cubePositions[0][2] += 0.1f;
+        if (glfwGetKey(window, GLFW_KEY_X) == GLFW_PRESS) cubePositions[0][2] -= 0.1f;
+
         
+
         glfwSwapBuffers(window);
         glfwPollEvents();
     }
@@ -258,7 +262,6 @@ int main()
     glDeleteVertexArrays(1, &VAO);
     glDeleteBuffers(1, &VBO);
     //glDeleteBuffers(1, &EBO);
-
     glfwTerminate();
     return 0;
 }
@@ -277,8 +280,7 @@ void processInput(GLFWwindow* window){
     if (glfwGetKey(window, GLFW_KEY_SPACE) == GLFW_PRESS)
         camera.ProcessKeyboard(UP, deltaTime);
     if (glfwGetKey(window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS)
-        camera.ProcessKeyboard(DOWN, deltaTime);
-    
+        camera.ProcessKeyboard(DOWN, deltaTime);  
 }
 
 void framebuffer_size_callback(GLFWwindow* window, int width, int height){
@@ -288,7 +290,6 @@ void framebuffer_size_callback(GLFWwindow* window, int width, int height){
 void mouse_callback(GLFWwindow* window, double xposIn, double yposIn){
     float xpos = static_cast<float>(xposIn);
     float ypos = static_cast<float>(yposIn);
-
     if (firstMouse){
         lastX = xpos;
         lastY = ypos;

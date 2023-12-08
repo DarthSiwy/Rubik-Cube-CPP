@@ -155,10 +155,6 @@
     <ClCompile Include="main.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="shader_vs" />
-    <None Include="shader_fs" />
-  </ItemGroup>
-  <ItemGroup>
     <ClInclude Include="camera.h" />
     <ClInclude Include="shader_m.h" />
     <ClInclude Include="stb_image.h" />
