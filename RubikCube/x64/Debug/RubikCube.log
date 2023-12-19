@@ -1,2 +1,8 @@
 ﻿  main.cpp
+C:\Users\Piotr\source\repos\Rubik-Cube-CPP\RubikCube\main.cpp(373,36): warning C4018: '<': signed/unsigned mismatch
+C:\Users\Piotr\source\repos\Rubik-Cube-CPP\RubikCube\main.cpp(377,61): warning C4305: 'argument': truncation from 'double' to 'T'
+          with
+          [
+              T=float
+          ]
   RubikCube.vcxproj -> C:\Users\Piotr\source\repos\Rubik-Cube-CPP\RubikCube\x64\Debug\RubikCube.exe
