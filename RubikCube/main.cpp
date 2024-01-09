@@ -22,8 +22,7 @@ void rotateX(float& x, float& y, float& z, float angle);
 void rotateY(float& x, float& y, float& z, float angle);
 void rotateZ(float& x, float& y, float& z, float angle);
 void rotateCube(float vertices[], int numVertices, float angle, int choose_axis);
-void make_is_transtioning(int isTransitioning[], int cube_positions_index[], int make_transitioning[]);
-
+void make_is_transtioning(int isTransitioning[], int cube_positions_index[], int make_transitioning[], int number_of_elements);
 void change_cube_postions_index(int cube_positions_index_previous[], int cube_positions_index_next[], int cube_positions_index[], int indexes_to_change[]);
 
 
@@ -32,7 +31,7 @@ void change_cube_postions_index(int cube_positions_index_previous[], int cube_po
 const unsigned int SCR_WIDTH = 1920;
 const unsigned int SCR_HEIGHT = 1080;
 // camera
-Camera camera(glm::vec3(0.0f, 0.0f, 3.0f));
+Camera camera(glm::vec3(3.0f, 3.0f, 3.0f));
 float lastX = SCR_WIDTH / 2.0f;
 float lastY = SCR_HEIGHT / 2.0f;
 bool firstMouse = true;
@@ -165,15 +164,15 @@ int main(){
         glm::vec3( -1.0f,   0.0f,  -1.0f),  // [17]
         glm::vec3(  1.0f,   0.0f,  -1.0f),  // [18]
 
-        glm::vec3( -1.0f,   5.0f,   1.0f),  // [19] CORNERS ON WHITE SIDE [UP]
-        glm::vec3(  1.0f,   5.0f,   1.0f),  // [20]
-        glm::vec3( -1.0f,   5.0f,  -1.0f),  // [21]
-        glm::vec3(  1.0f,   5.0f,  -1.0f),  // [22]
+        glm::vec3( -1.0f,   1.0f,   1.0f),  // [19] CORNERS ON WHITE SIDE [UP]
+        glm::vec3(  1.0f,   1.0f,   1.0f),  // [20]
+        glm::vec3( -1.0f,   1.0f,  -1.0f),  // [21]
+        glm::vec3(  1.0f,   1.0f,  -1.0f),  // [22]
 
-        glm::vec3( -1.0f,  -5.0f,   1.0f),  // [23] CORNERS ON YELLOW SIDE [BOTTOM] 
-        glm::vec3(  1.0f,  -5.0f,   1.0f),  // [24]
-        glm::vec3( -1.0f,  -5.0f,  -1.0f),  // [25]
-        glm::vec3(  1.0f,  -5.0f,  -1.0f),  // [26]
+        glm::vec3( -1.0f,  -1.0f,   1.0f),  // [23] CORNERS ON YELLOW SIDE [BOTTOM] 
+        glm::vec3(  1.0f,  -1.0f,   1.0f),  // [24]
+        glm::vec3( -1.0f,  -1.0f,  -1.0f),  // [25]
+        glm::vec3(  1.0f,  -1.0f,  -1.0f),  // [26]
     };
 
     // CREATE 27 COPIES OF CUBES 
@@ -350,6 +349,7 @@ int main(){
 
     int redner_cubes_number = 26;
     redner_cubes_number++;
+    int number_of_elements = 0;
 
     // RENDER LOOP      -----------------------------------------------------------------------------------------------------------------------------
     while (!glfwWindowShouldClose(window)) {
@@ -447,11 +447,17 @@ int main(){
                 transitionProgress = 0.0f;
                 angle_f = -90.0f;
                 y = 1;
-                int make_transitioning[] = { 1, 7, 8, 9, 10 };
-                make_is_transtioning(isTransitioning, cube_positions_index, make_transitioning);
-                int indexes_to_change[] = { 7, 10, 8, 9 };
+                int make_transitioning[] = { 1, 7, 8, 9, 10, 19, 20, 21, 22 };
+                number_of_elements = 9;
+                make_is_transtioning(isTransitioning, cube_positions_index, make_transitioning, number_of_elements);
+               
+                int indexes_to_change_edges[] = { 7, 10, 8, 9 };
                 change_cube_postions_index(cube_positions_index_previous, cube_positions_index_next,
-                    cube_positions_index, indexes_to_change);
+                    cube_positions_index, indexes_to_change_edges);
+
+                int indexes_to_change_corners[] = {19, 21, 22, 20};
+                change_cube_postions_index(cube_positions_index_previous, cube_positions_index_next,
+                    cube_positions_index, indexes_to_change_corners);
             }
 
             // MOVE R
@@ -459,11 +465,16 @@ int main(){
                 transitionProgress = 0.0f;
                 angle_f = -90.0f;
                 x = 1;
-                int make_transitioning[] = { 5, 9, 18, 13, 16 };
-                make_is_transtioning(isTransitioning, cube_positions_index, make_transitioning);
+                int make_transitioning[] = { 5, 9, 18, 13, 16, 20, 22, 24, 26 };
+                number_of_elements = 9;
+                make_is_transtioning(isTransitioning, cube_positions_index, make_transitioning, number_of_elements);
                 int indexes_to_change[] = { 18, 13, 16, 9 };
                 change_cube_postions_index(cube_positions_index_previous, cube_positions_index_next,
                     cube_positions_index, indexes_to_change);
+
+                int indexes_to_change_corners[] = { 20, 22, 26, 24 };
+                change_cube_postions_index(cube_positions_index_previous, cube_positions_index_next,
+                    cube_positions_index, indexes_to_change_corners);
             }
         }
 
@@ -474,23 +485,24 @@ int main(){
         // SWAP BUFFERS
         glfwSwapBuffers(window);
         glfwPollEvents();
+
+        for (int i = 0; i < 27; i++) {
+            glDeleteVertexArrays(1, &VAO[i]);
+            glDeleteBuffers(1, &VBO[i]);
+        }
     }
 
     // DELETE BUFFERS
-    for (int i = 0; i < 27; i++) {
-        glDeleteVertexArrays(1, &axisVAO);
-        glDeleteBuffers(1, &axisVBO);
-        glDeleteVertexArrays(1, &VAO[i]);
-        glDeleteBuffers(1, &VBO[i]);
-    }
+    glDeleteVertexArrays(1, &axisVAO);
+    glDeleteBuffers(1, &axisVBO);
     glfwTerminate();
     return 0;
 }
 // -------------------------------------------------------------------------------------------------------------------------------
 
 // START ANIMATION
-void make_is_transtioning(int isTransitioning[], int cube_positions_index[], int make_transitioning[]) {
-    for (int i = 0; i < 5; i++) isTransitioning[cube_positions_index[make_transitioning[i]]] = 1;
+void make_is_transtioning(int isTransitioning[], int cube_positions_index[], int make_transitioning[], int number_of_elements) {
+    for (int i = 0; i < number_of_elements; i++) isTransitioning[cube_positions_index[make_transitioning[i]]] = 1;
 } 
 
 void change_cube_postions_index(int cube_positions_index_previous[], int cube_positions_index_next[], int cube_positions_index[], int indexes_to_change[]){
