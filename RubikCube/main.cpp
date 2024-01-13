@@ -253,24 +253,7 @@ int main(){
         }
     }
 
-    // CREATE 27 VERTEXES
-    unsigned int VBO[27], VAO[27];
-    for (int i = 0; i < 27; i++) {
-        glGenVertexArrays(1, &VAO[i]);
-        glGenBuffers(1, &VBO[i]);
-        glBindVertexArray(VAO[i]);
-        glBindBuffer(GL_ARRAY_BUFFER, VBO[i]);
-        glBufferData(GL_ARRAY_BUFFER, sizeof(vertices[i]), vertices[i], GL_STATIC_DRAW);
-        // position attribute
-        glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)0);
-        glEnableVertexAttribArray(0);
-        // texture coord attributes 
-        glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(3 * sizeof(float)));
-        glEnableVertexAttribArray(1);
-        // texture color attribute
-        glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(5 * sizeof(float)));
-        glEnableVertexAttribArray(2);
-    }
+    
 
     // TEXTURES
     unsigned int texture1, texture2;
@@ -359,6 +342,25 @@ int main(){
     camera.Pitch-= 30.0f;
     camera.updateCameraVectors();
 
+    // CREATE 27 VERTEXES
+    unsigned int VBO[27], VAO[27];
+    for (int i = 0; i < 27; i++) {
+        glGenVertexArrays(1, &VAO[i]);
+        glGenBuffers(1, &VBO[i]);
+        glBindVertexArray(VAO[i]);
+        glBindBuffer(GL_ARRAY_BUFFER, VBO[i]);
+        glBufferData(GL_ARRAY_BUFFER, sizeof(vertices[i]), vertices[i], GL_STATIC_DRAW);
+        // position attribute
+        glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)0);
+        glEnableVertexAttribArray(0);
+        // texture coord attributes 
+        glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(3 * sizeof(float)));
+        glEnableVertexAttribArray(1);
+        // texture color attribute
+        glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(5 * sizeof(float)));
+        glEnableVertexAttribArray(2);
+    }
+
     // RENDER LOOP      ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
     while (!glfwWindowShouldClose(window)) {
         float currentFrame = static_cast<float>(glfwGetTime());
@@ -393,21 +395,9 @@ int main(){
 
         // RENDERNING CUBES 
         for (unsigned int i = 0; i < redner_cubes_number; i++) {
-            glGenVertexArrays(1, &VAO[i]);
-            glGenBuffers(1, &VBO[i]);
-            glBindVertexArray(VAO[i]);
             glBindBuffer(GL_ARRAY_BUFFER, VBO[i]);
-            glBufferData(GL_ARRAY_BUFFER, sizeof(vertices[i]), vertices[i], GL_STATIC_DRAW);
-            // position attribute
-            glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)0);
-            glEnableVertexAttribArray(0);
-            // texture coord attributes 
-            glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(3 * sizeof(float)));
-            glEnableVertexAttribArray(1);
-            // texture color attribute
-            glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(5 * sizeof(float)));
-            glEnableVertexAttribArray(2);
-            
+            glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(vertices[i]), vertices[i]);
+                        
             glBindVertexArray(VAO[i]);
             glm::mat4 model = glm::mat4(1.0f);
             if (i == 0) model = glm::scale(model, glm::vec3(0.1));
@@ -517,8 +507,8 @@ int main(){
         glfwPollEvents();
 
         for (int i = 0; i < 27; i++) {
-            glDeleteVertexArrays(1, &VAO[i]);
-            glDeleteBuffers(1, &VBO[i]);
+            //glDeleteVertexArrays(1, &VAO[i]);
+            //glDeleteBuffers(1, &VBO[i]);
         }
     }
     // DELETE BUFFERS
