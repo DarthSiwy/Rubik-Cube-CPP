@@ -151,15 +151,17 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="cubes.cpp" />
     <ClCompile Include="glad.c" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="movements.cpp" />
-    <ClCompile Include="functions.cpp" />
+    <ClCompile Include="rotations.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="camera.h" />
+    <ClInclude Include="cubes.h" />
     <ClInclude Include="movements.h" />
-    <ClInclude Include="functions.h" />
+    <ClInclude Include="rotations.h" />
     <ClInclude Include="shader_m.h" />
     <ClInclude Include="stb_image.h" />
   </ItemGroup>

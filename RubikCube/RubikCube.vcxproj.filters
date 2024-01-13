@@ -21,10 +21,13 @@
     <ClCompile Include="glad.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="functions.cpp">
+    <ClCompile Include="rotations.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="movements.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="cubes.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -38,10 +41,13 @@
     <ClInclude Include="camera.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="functions.h">
+    <ClInclude Include="rotations.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="movements.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="cubes.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

@@ -1,11 +1,1 @@
-﻿  main.cpp
-C:\Users\Piotr\source\repos\Rubik-Cube-CPP\RubikCube\main.cpp(397,36): warning C4018: '<': signed/unsigned mismatch
-C:\Users\Piotr\source\repos\Rubik-Cube-CPP\RubikCube\main.cpp(403,61): warning C4305: 'argument': truncation from 'double' to 'T'
-          with
-          [
-              T=float
-          ]
-C:\Users\Piotr\source\repos\Rubik-Cube-CPP\RubikCube\main.cpp(244,79): warning C4101: 'vertices_cubeposition_next': unreferenced local variable
-C:\Users\Piotr\source\repos\Rubik-Cube-CPP\RubikCube\main.cpp(244,43): warning C4101: 'vertices_cubeposition_previous': unreferenced local variable
-C:\Users\Piotr\source\repos\Rubik-Cube-CPP\RubikCube\main.cpp(246,15): warning C4101: 'vertices_translated': unreferenced local variable
-  RubikCube.vcxproj -> C:\Users\Piotr\source\repos\Rubik-Cube-CPP\RubikCube\x64\Debug\RubikCube.exe
+﻿  RubikCube.vcxproj -> C:\Users\Piotr\source\repos\Rubik-Cube-CPP\RubikCube\x64\Debug\RubikCube.exe
