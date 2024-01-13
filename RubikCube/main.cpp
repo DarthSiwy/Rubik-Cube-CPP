@@ -3,10 +3,12 @@
 #include "stb.cpp"
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
-#include <glm/gtc/type_ptr.hpp>
+//#include <glm/gtc/type_ptr.hpp>
 
 #include "shader_s.h"
 #include "camera.h"
+#include "functions.h"
+#include "movements.h"
 
 #include <cmath>
 #include <string>
@@ -18,26 +20,19 @@ void mouse_callback(GLFWwindow* window, double xpos, double ypos);
 void scroll_callback(GLFWwindow* window, double xoffset, double yoffset);
 void processInput(GLFWwindow* window);
 
-void rotateX(float& x, float& y, float& z, float angle);
-void rotateY(float& x, float& y, float& z, float angle);
-void rotateZ(float& x, float& y, float& z, float angle);
-void rotateCube(float vertices[], int numVertices, float angle, int choose_axis);
-void make_is_transtioning(int isTransitioning[], int cube_positions_index[], int make_transitioning[], int number_of_elements);
-void change_cube_postions_index(int cube_positions_index_previous[], int cube_positions_index_next[], int cube_positions_index[], int indexes_to_change[]);
-
-
-
 // settings
 const unsigned int SCR_WIDTH = 1920;
 const unsigned int SCR_HEIGHT = 1080;
 // camera
-Camera camera(glm::vec3(3.0f, 3.0f, 3.0f));
+Camera camera(glm::vec3(3.0f, 2.9f, 4.7f));
 float lastX = SCR_WIDTH / 2.0f;
 float lastY = SCR_HEIGHT / 2.0f;
 bool firstMouse = true;
 // timing
 float deltaTime = 0.0f;
 float lastFrame = 0.0f;
+float speed_1 = 0.4f;
+float speed_2 = 0.2f;
 
 
 int main(){
@@ -248,12 +243,10 @@ int main(){
     // MOVING CUBES 
     glm::vec3  vertices_cubeposition[27], vertices_cubeposition_previous[27], vertices_cubeposition_next[27];
     for (int i = 0; i < 27; i++) {
-
         float vertices_translated[72];  
         for (int j = 0; j < 288; j += 8) {
                 glm::vec3 originalVertex(vertices_main[j], vertices_main[j+1], vertices_main[j+2]);
                 vertices_cubeposition[i] = originalVertex + cube_positions_translation[i];
-
                 vertices[i][j+0] = vertices_cubeposition[i].x;
                 vertices[i][j+1] = vertices_cubeposition[i].y;
                 vertices[i][j+2] = vertices_cubeposition[i].z;   
@@ -266,10 +259,8 @@ int main(){
         glGenVertexArrays(1, &VAO[i]);
         glGenBuffers(1, &VBO[i]);
         glBindVertexArray(VAO[i]);
-
         glBindBuffer(GL_ARRAY_BUFFER, VBO[i]);
         glBufferData(GL_ARRAY_BUFFER, sizeof(vertices[i]), vertices[i], GL_STATIC_DRAW);
-
         // position attribute
         glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)0);
         glEnableVertexAttribArray(0);
@@ -325,33 +316,50 @@ int main(){
     stbi_image_free(data);
     ourShader.use();
     ourShader.setInt("texture1", 0);
-    ourShader.setInt("texture2", 1);
-    
-    // KEYBOARD
-    int previousKeyState_u = GLFW_RELEASE;
-    int previousKeyState_r = GLFW_RELEASE;
+    ourShader.setInt("texture2", 1);  
 
     //bool isTransitioning = false;
     int isTransitioning[27];
     for (int i = 0; i < 27; i++) isTransitioning[i] = 0;
 
     // ANIMATION
-    float transitionDuration = 1.0f; // Duration of the transition in seconds
-    float transitionProgress = 0.0f; // Progress of the transition (0.0 to 1.0)
+    float transitionDuration = 1.0f; 
+    float transitionProgress = 0.0f; 
     float rotationSpeed = 0.2f;
-
-    // ROTATION
-    int x=0, y=0, z=0;
-    int u = 0, r = 0;
     float angle_f = 1.0f;
-
-    glm::vec3 axis_of_rotation = glm::vec3(0.0f, 0.0f, 0.0f);
-
+    int look_position = 0;
     int redner_cubes_number = 26;
-    redner_cubes_number++;
     int number_of_elements = 0;
+    int axis_of_rotation = 0;
+    redner_cubes_number++;
 
-    // RENDER LOOP      -----------------------------------------------------------------------------------------------------------------------------
+    glm::vec3 axis_of_rotation_vec = glm::vec3(0.0f, 0.0f, 0.0f);
+
+    // KEYBOARD
+    int previousKeyState_Space = GLFW_RELEASE;
+    int previousKeyState_W = GLFW_RELEASE;
+    int previousKeyState_A = GLFW_RELEASE;
+    int previousKeyState_S = GLFW_RELEASE;
+    int previousKeyState_D = GLFW_RELEASE;
+
+    int previousKeyState_1 = GLFW_RELEASE;
+    int previousKeyState_2 = GLFW_RELEASE;
+    int previousKeyState_3 = GLFW_RELEASE;
+    int previousKeyState_4 = GLFW_RELEASE;
+    int previousKeyState_5 = GLFW_RELEASE;
+    int previousKeyState_6 = GLFW_RELEASE;
+
+    int previousKeyState_RIGHT = GLFW_RELEASE;
+    int previousKeyState_UP    = GLFW_RELEASE;
+    int previousKeyState_DOWN  = GLFW_RELEASE;
+    int previousKeyState_LEFT  = GLFW_RELEASE;
+
+    // CAMERA POSITION
+    camera.Yaw -= 30.0f;
+    camera.Pitch-= 30.0f;
+    camera.updateCameraVectors();
+
+    // RENDER LOOP      ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
     while (!glfwWindowShouldClose(window)) {
         float currentFrame = static_cast<float>(glfwGetTime());
         deltaTime = currentFrame - lastFrame;
@@ -381,7 +389,7 @@ int main(){
         ourShader.setMat4("projection", projection);
         glm::mat4 view = camera.GetViewMatrix();
         ourShader.setMat4("view", view);
-
+        //camera.DisplayPosition();
 
         // RENDERNING CUBES 
         for (unsigned int i = 0; i < redner_cubes_number; i++) {
@@ -407,12 +415,10 @@ int main(){
             // TRANSITION
             if (isTransitioning[i] == 1) {
                 float angle = glm::radians(angle_f) * transitionProgress;
-                if (x == 1) axis_of_rotation[0] = 1.0f;
-                if (y == 1) axis_of_rotation[1] = 1.0f;
-                if (z == 1) axis_of_rotation[2] = 1.0f;
+                if (axis_of_rotation != 0) axis_of_rotation_vec[axis_of_rotation-1] = 1.0f;
 
-                model = glm::rotate(model, angle, axis_of_rotation);
-                axis_of_rotation = glm::vec3(0.0f, 0.0f, 0.0f);
+                model = glm::rotate(model, angle, axis_of_rotation_vec);
+                axis_of_rotation_vec = glm::vec3(0.0f, 0.0f, 0.0f);
             } 
             
             // UPDATE TRANSITION PROGRESS
@@ -421,14 +427,13 @@ int main(){
                 if (transitionProgress >= 1.0f) {
                     transitionProgress = 0.0f;
                     for (int k = 0; k < 27; k++) {
+                        // END OF ANIMATION
                         if (isTransitioning[k] == 1) {
-                            if (x == 1) rotateCube(vertices[k], sizeof(vertices_main) / sizeof(float), angle_f,0);
-                            if (y == 1) rotateCube(vertices[k], sizeof(vertices_main) / sizeof(float), angle_f,1);
-                            if (z == 1) rotateCube(vertices[k], sizeof(vertices_main) / sizeof(float), angle_f,2);
+                            if (axis_of_rotation != 0) rotateCube(vertices[k], sizeof(vertices_main) / sizeof(float), angle_f, axis_of_rotation);
                             isTransitioning[k] = 0;
                         }  
                     }
-                    x = y = z = 0;   
+                    axis_of_rotation = 0;
                 }
             }
 
@@ -437,50 +442,75 @@ int main(){
             glDrawArrays(GL_TRIANGLES, 0, 36);
         }
 
+
         // KEYBOARD STATE 
-        int currentKeyState_u = glfwGetKey(window, GLFW_KEY_U);
-        int currentKeyState_r = glfwGetKey(window, GLFW_KEY_R);
+        int currentKeyState_Space = glfwGetKey(window, GLFW_KEY_SPACE);
+        int currentKeyState_W = glfwGetKey(window, GLFW_KEY_W);
+        int currentKeyState_A = glfwGetKey(window, GLFW_KEY_A);
+        int currentKeyState_S = glfwGetKey(window, GLFW_KEY_S);
+        int currentKeyState_D = glfwGetKey(window, GLFW_KEY_D);
 
+        int currentKeyState_1 = glfwGetKey(window, GLFW_KEY_1);
+        int currentKeyState_2 = glfwGetKey(window, GLFW_KEY_2);
+        int currentKeyState_3 = glfwGetKey(window, GLFW_KEY_3);
+        int currentKeyState_4 = glfwGetKey(window, GLFW_KEY_4);
+        int currentKeyState_5 = glfwGetKey(window, GLFW_KEY_5);
+        int currentKeyState_6 = glfwGetKey(window, GLFW_KEY_6);
+
+        int currentKeyState_RIGHT = glfwGetKey(window, GLFW_KEY_RIGHT);
+        int currentKeyState_UP    = glfwGetKey(window, GLFW_KEY_UP);
+        int currentKeyState_DOWN  = glfwGetKey(window, GLFW_KEY_DOWN);
+        int currentKeyState_LEFT  = glfwGetKey(window, GLFW_KEY_LEFT);
+
+        // KEYBOARD MOVEMENTS 
         if (transitionProgress == 0.0f){
-            // MOVE U
-            if (currentKeyState_u == GLFW_PRESS && previousKeyState_u == GLFW_RELEASE) {
-                transitionProgress = 0.0f;
-                angle_f = -90.0f;
-                y = 1;
-                int make_transitioning[] = { 1, 7, 8, 9, 10, 19, 20, 21, 22 };
-                number_of_elements = 9;
-                make_is_transtioning(isTransitioning, cube_positions_index, make_transitioning, number_of_elements);
-               
-                int indexes_to_change_edges[] = { 7, 10, 8, 9 };
-                change_cube_postions_index(cube_positions_index_previous, cube_positions_index_next,
-                    cube_positions_index, indexes_to_change_edges);
+            if (currentKeyState_1 == GLFW_PRESS && previousKeyState_1 == GLFW_RELEASE) movement_U (1, 1, 1, rotationSpeed, transitionProgress, angle_f, axis_of_rotation, isTransitioning, cube_positions_index, cube_positions_index_previous, cube_positions_index_next);
+            if (currentKeyState_2 == GLFW_PRESS && previousKeyState_2 == GLFW_RELEASE) movement_D (1, 1, 1, rotationSpeed, transitionProgress, angle_f, axis_of_rotation, isTransitioning, cube_positions_index, cube_positions_index_previous, cube_positions_index_next);
+            if (currentKeyState_3 == GLFW_PRESS && previousKeyState_3 == GLFW_RELEASE) movement_F (1, 1, 1, rotationSpeed, transitionProgress, angle_f, axis_of_rotation, isTransitioning, cube_positions_index, cube_positions_index_previous, cube_positions_index_next);
+            if (currentKeyState_4 == GLFW_PRESS && previousKeyState_4 == GLFW_RELEASE) movement_B (1, 1, 1, rotationSpeed, transitionProgress, angle_f, axis_of_rotation, isTransitioning, cube_positions_index, cube_positions_index_previous, cube_positions_index_next);
+            if (currentKeyState_5 == GLFW_PRESS && previousKeyState_5 == GLFW_RELEASE) movement_R (1, 1, 1, rotationSpeed, transitionProgress, angle_f, axis_of_rotation, isTransitioning, cube_positions_index, cube_positions_index_previous, cube_positions_index_next);
+            if (currentKeyState_6 == GLFW_PRESS && previousKeyState_6 == GLFW_RELEASE) movement_L (1, 1, 1, rotationSpeed, transitionProgress, angle_f, axis_of_rotation, isTransitioning, cube_positions_index, cube_positions_index_previous, cube_positions_index_next);
 
-                int indexes_to_change_corners[] = {19, 21, 22, 20};
-                change_cube_postions_index(cube_positions_index_previous, cube_positions_index_next,
-                    cube_positions_index, indexes_to_change_corners);
-            }
+            if (currentKeyState_RIGHT == GLFW_PRESS && previousKeyState_RIGHT == GLFW_RELEASE) movement_Y(1, 1, 1, rotationSpeed, transitionProgress, angle_f, axis_of_rotation, isTransitioning, cube_positions_index, cube_positions_index_previous, cube_positions_index_next);
+            if (currentKeyState_LEFT  == GLFW_PRESS && previousKeyState_LEFT  == GLFW_RELEASE) movement_Y(1, 1,-1, rotationSpeed, transitionProgress, angle_f, axis_of_rotation, isTransitioning, cube_positions_index, cube_positions_index_previous, cube_positions_index_next);
+            if (currentKeyState_UP    == GLFW_PRESS && previousKeyState_UP    == GLFW_RELEASE) movement_X(1, 1, 1, rotationSpeed, transitionProgress, angle_f, axis_of_rotation, isTransitioning, cube_positions_index, cube_positions_index_previous, cube_positions_index_next);
+            if (currentKeyState_DOWN  == GLFW_PRESS && previousKeyState_DOWN  == GLFW_RELEASE) movement_X(1, 1,-1, rotationSpeed, transitionProgress, angle_f, axis_of_rotation, isTransitioning, cube_positions_index, cube_positions_index_previous, cube_positions_index_next);
+        }
 
-            // MOVE R
-            if (currentKeyState_r == GLFW_PRESS && previousKeyState_r == GLFW_RELEASE) {
-                transitionProgress = 0.0f;
-                angle_f = -90.0f;
-                x = 1;
-                int make_transitioning[] = { 5, 9, 18, 13, 16, 20, 22, 24, 26 };
-                number_of_elements = 9;
-                make_is_transtioning(isTransitioning, cube_positions_index, make_transitioning, number_of_elements);
-                int indexes_to_change[] = { 18, 13, 16, 9 };
-                change_cube_postions_index(cube_positions_index_previous, cube_positions_index_next,
-                    cube_positions_index, indexes_to_change);
-
-                int indexes_to_change_corners[] = { 20, 22, 26, 24 };
-                change_cube_postions_index(cube_positions_index_previous, cube_positions_index_next,
-                    cube_positions_index, indexes_to_change_corners);
-            }
+        // SPACE LOOK
+        if (currentKeyState_Space == GLFW_PRESS && previousKeyState_Space == GLFW_RELEASE && look_position == 0) {
+            camera.Position.x -= 6.0f;
+            camera.Yaw += 60.0f;
+            camera.updateCameraVectors();    
+            look_position = 1;
+            previousKeyState_Space = currentKeyState_Space;
+        }
+        if (currentKeyState_Space == GLFW_PRESS && previousKeyState_Space == GLFW_RELEASE && look_position == 1) {
+            camera.Position.x += 6.0f;
+            camera.Yaw -= 60.0f;
+            camera.updateCameraVectors();
+            look_position = 0;
+            previousKeyState_Space = currentKeyState_Space;
         }
 
         // KEYBOARD STATE
-        previousKeyState_u = currentKeyState_u;
-        previousKeyState_r = currentKeyState_r;
+        previousKeyState_Space = currentKeyState_Space;
+        previousKeyState_W = currentKeyState_W;
+        previousKeyState_A = currentKeyState_A;
+        previousKeyState_S = currentKeyState_S;
+        previousKeyState_D = currentKeyState_D;
+
+        previousKeyState_1 = currentKeyState_1;
+        previousKeyState_2 = currentKeyState_2;
+        previousKeyState_3 = currentKeyState_3;
+        previousKeyState_4 = currentKeyState_4;
+        previousKeyState_5 = currentKeyState_5;
+        previousKeyState_6 = currentKeyState_6;
+
+        previousKeyState_RIGHT = currentKeyState_RIGHT;
+        previousKeyState_LEFT  = currentKeyState_LEFT;
+        previousKeyState_UP    = currentKeyState_UP;
+        previousKeyState_DOWN  = currentKeyState_DOWN;
 
         // SWAP BUFFERS
         glfwSwapBuffers(window);
@@ -491,89 +521,18 @@ int main(){
             glDeleteBuffers(1, &VBO[i]);
         }
     }
-
     // DELETE BUFFERS
     glDeleteVertexArrays(1, &axisVAO);
     glDeleteBuffers(1, &axisVBO);
     glfwTerminate();
     return 0;
 }
-// -------------------------------------------------------------------------------------------------------------------------------
+// ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
 // START ANIMATION
-void make_is_transtioning(int isTransitioning[], int cube_positions_index[], int make_transitioning[], int number_of_elements) {
-    for (int i = 0; i < number_of_elements; i++) isTransitioning[cube_positions_index[make_transitioning[i]]] = 1;
-} 
 
-void change_cube_postions_index(int cube_positions_index_previous[], int cube_positions_index_next[], int cube_positions_index[], int indexes_to_change[]){
-    cube_positions_index_previous[indexes_to_change[0]] = cube_positions_index[indexes_to_change[0]];
-    cube_positions_index_previous[indexes_to_change[1]] = cube_positions_index[indexes_to_change[1]];
-    cube_positions_index_previous[indexes_to_change[2]] = cube_positions_index[indexes_to_change[2]];
-    cube_positions_index_previous[indexes_to_change[3]] = cube_positions_index[indexes_to_change[3]];
 
-    cube_positions_index_next[indexes_to_change[0]] = cube_positions_index_previous[indexes_to_change[3]];
-    cube_positions_index_next[indexes_to_change[1]] = cube_positions_index_previous[indexes_to_change[0]];
-    cube_positions_index_next[indexes_to_change[2]] = cube_positions_index_previous[indexes_to_change[1]];
-    cube_positions_index_next[indexes_to_change[3]] = cube_positions_index_previous[indexes_to_change[2]];
 
-    cube_positions_index[indexes_to_change[0]] = cube_positions_index_next[indexes_to_change[0]];
-    cube_positions_index[indexes_to_change[1]] = cube_positions_index_next[indexes_to_change[1]];
-    cube_positions_index[indexes_to_change[2]] = cube_positions_index_next[indexes_to_change[2]];
-    cube_positions_index[indexes_to_change[3]] = cube_positions_index_next[indexes_to_change[3]];
-}
-
-// ROTATION
-void rotateCube(float vertices[], int numVertices, float angle, int choose_axis) {
-    for (int i = 0; i < numVertices; i += 8) {
-        float x = vertices[i];
-        float y = vertices[i + 1];
-        float z = vertices[i + 2];
-
-        if (choose_axis == 0) rotateX(x, y, z, angle);
-        if (choose_axis == 1) rotateY(x, y, z, angle);
-        if (choose_axis == 2) rotateZ(x, y, z, angle);
-
-        vertices[i] = x;
-        vertices[i + 1] = y;
-        vertices[i + 2] = z;
-    }
-}
-
-void rotateX(float& x, float& y, float& z, float angle) {
-    float radians = glm::radians(angle);
-    float cosTheta = std::cos(radians);
-    float sinTheta = std::sin(radians);
-
-    float newY = cosTheta * y - sinTheta * z;
-    float newZ = sinTheta * y + cosTheta * z;
-
-    y = newY;
-    z = newZ;
-}
-
-void rotateY(float& x, float& y, float& z, float angle) {
-    float radians = glm::radians(angle);
-    float cosTheta = std::cos(radians);
-    float sinTheta = std::sin(radians);
-
-    float newX = cosTheta * x + sinTheta * z;
-    float newZ = -sinTheta * x + cosTheta * z;
-
-    x = newX;
-    z = newZ;
-}
-
-void rotateZ(float& x, float& y, float& z, float angle) {
-    float radians = glm::radians(angle);
-    float cosTheta = std::cos(radians);
-    float sinTheta = std::sin(radians);
-
-    float newX = cosTheta * x - sinTheta * y;
-    float newY = sinTheta * x + cosTheta * y;
-
-    x = newX;
-    y = newY;
-}
 
 // CAMERA MOVEMENT
 void processInput(GLFWwindow* window) {
@@ -588,7 +547,7 @@ void processInput(GLFWwindow* window) {
     if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
         camera.ProcessKeyboard(RIGHT, deltaTime);
     if (glfwGetKey(window, GLFW_KEY_SPACE) == GLFW_PRESS)
-        camera.ProcessKeyboard(UP, deltaTime);
+    //    camera.ProcessKeyboard(UP, deltaTime);
     if (glfwGetKey(window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS)
         camera.ProcessKeyboard(DOWN, deltaTime);
 }
@@ -607,13 +566,10 @@ void mouse_callback(GLFWwindow* window, double xposIn, double yposIn) {
         lastY = ypos;
         firstMouse = false;
     }
-
     float xoffset = xpos - lastX;
     float yoffset = lastY - ypos;
-
     lastX = xpos;
     lastY = ypos;
-
     camera.ProcessMouseMovement(xoffset, yoffset);
 }
 

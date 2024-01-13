@@ -6,6 +6,7 @@
 #include <glm/gtc/matrix_transform.hpp>
 
 #include <vector>
+#include <iomanip>
 
 // Defines several possible options for camera movement. Used as abstraction to stay away from window-system specific input methods
 enum Camera_Movement {
@@ -72,18 +73,14 @@ public:
     void ProcessKeyboard(Camera_Movement direction, float deltaTime)
     {
         float velocity = MovementSpeed * deltaTime;
-        if (direction == FORWARD)
-            Position += Front * velocity;
-        if (direction == BACKWARD)
-            Position -= Front * velocity;
-        if (direction == LEFT)
-            Position -= Right * velocity;
-        if (direction == RIGHT)
-            Position += Right * velocity;
-        if (direction == UP)
-            Position +=Up * velocity;
-        if (direction == DOWN)
-            Position -= Up * velocity;
+        if (direction == FORWARD)   Position += velocity * Front;
+        if (direction == BACKWARD)  Position -= velocity * Front;
+        if (direction == RIGHT)     Position += velocity * Right;
+        if (direction == LEFT)      Position -= velocity * Right;
+        if (direction == UP)        Position += velocity * Up;
+        if (direction == DOWN)      Position -= velocity * Up;
+
+        
     }
 
     // processes input received from a mouse input system. Expects the offset value in both the x and y direction.
@@ -117,9 +114,17 @@ public:
         if (Zoom > 45.0f)
             Zoom = 45.0f;
     }
+    void DisplayPosition() const {
+        std::cout << std::fixed << std::setprecision(2) 
+            << Position.x << "\t"
+            << Position.y << "\t"
+            << Position.z << "\t"
+            << std::endl;
+    }
 
-private:
+//private:
     // calculates the front vector from the Camera's (updated) Euler Angles
+    
     void updateCameraVectors()
     {
         // calculate the new Front vector
@@ -131,6 +136,8 @@ private:
         // also re-calculate the Right and Up vector
         Right = glm::normalize(glm::cross(Front, WorldUp));  // normalize the vectors, because their length gets closer to 0 the more you look up or down which results in slower movement.
         Up = glm::normalize(glm::cross(Right, Front));
+        //std::cout << front.x << "\t" << front.y << "\t" << front.z <<std::endl;
     }
+
 };
 #endif
