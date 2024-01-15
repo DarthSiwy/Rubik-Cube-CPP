@@ -145,15 +145,17 @@ int main(){
     int number_of_elements = 0;
     int axis_of_rotation = 0;
     redner_cubes_number++;
+    int S = 1;
 
     glm::vec3 axis_of_rotation_vec = glm::vec3(0.0f, 0.0f, 0.0f);
 
     // KEYBOARD
-    int previousKeyState_Space = GLFW_RELEASE;
     int previousKeyState_W = GLFW_RELEASE;
     int previousKeyState_A = GLFW_RELEASE;
     int previousKeyState_S = GLFW_RELEASE;
     int previousKeyState_D = GLFW_RELEASE;
+    int previousKeyState_R = GLFW_RELEASE;
+    int previousKeyState_F = GLFW_RELEASE;
 
     int previousKeyState_1 = GLFW_RELEASE;
     int previousKeyState_2 = GLFW_RELEASE;
@@ -166,6 +168,9 @@ int main(){
     int previousKeyState_UP    = GLFW_RELEASE;
     int previousKeyState_DOWN  = GLFW_RELEASE;
     int previousKeyState_LEFT  = GLFW_RELEASE;
+
+    int previousKeyState_SHIFT = GLFW_RELEASE;
+    int previousKeyState_Space = GLFW_RELEASE;
 
     // CAMERA POSITION
     camera.Yaw -= 30.0f;
@@ -189,7 +194,7 @@ int main(){
         glm::mat4 model = glm::mat4(1.0f);
         ourShader.setMat4("model", model);
         glBindVertexArray(axisVAO);
-        glDrawArrays(GL_LINES, 0, 6);
+        //glDrawArrays(GL_LINES, 0, 6);
 
         // Activate Textures
         glActiveTexture(GL_TEXTURE0);
@@ -242,11 +247,12 @@ int main(){
 
 
         // KEYBOARD STATE 
-        int currentKeyState_Space = glfwGetKey(window, GLFW_KEY_SPACE);
         int currentKeyState_W = glfwGetKey(window, GLFW_KEY_W);
         int currentKeyState_A = glfwGetKey(window, GLFW_KEY_A);
         int currentKeyState_S = glfwGetKey(window, GLFW_KEY_S);
         int currentKeyState_D = glfwGetKey(window, GLFW_KEY_D);
+        int currentKeyState_R = glfwGetKey(window, GLFW_KEY_R);
+        int currentKeyState_F = glfwGetKey(window, GLFW_KEY_F);
 
         int currentKeyState_1 = glfwGetKey(window, GLFW_KEY_1);
         int currentKeyState_2 = glfwGetKey(window, GLFW_KEY_2);
@@ -260,14 +266,19 @@ int main(){
         int currentKeyState_DOWN  = glfwGetKey(window, GLFW_KEY_DOWN);
         int currentKeyState_LEFT  = glfwGetKey(window, GLFW_KEY_LEFT);
 
+        int currentKeyState_Space = glfwGetKey(window, GLFW_KEY_SPACE);
+        int currentKeyState_SHIFT = glfwGetKey(window, GLFW_KEY_LEFT_SHIFT);
+        S = 1;
+
         // KEYBOARD MOVEMENTS 
         if (transitionProgress == 0.0f){
-            if (currentKeyState_1 == GLFW_PRESS && previousKeyState_1 == GLFW_RELEASE) movement_U (1, 1, 1, rotationSpeed, transitionProgress, angle_f, axis_of_rotation, isTransitioning, cube_positions_index, cube_positions_index_previous, cube_positions_index_next);
-            if (currentKeyState_2 == GLFW_PRESS && previousKeyState_2 == GLFW_RELEASE) movement_D (1, 1, 1, rotationSpeed, transitionProgress, angle_f, axis_of_rotation, isTransitioning, cube_positions_index, cube_positions_index_previous, cube_positions_index_next);
-            if (currentKeyState_3 == GLFW_PRESS && previousKeyState_3 == GLFW_RELEASE) movement_F (1, 1, 1, rotationSpeed, transitionProgress, angle_f, axis_of_rotation, isTransitioning, cube_positions_index, cube_positions_index_previous, cube_positions_index_next);
-            if (currentKeyState_4 == GLFW_PRESS && previousKeyState_4 == GLFW_RELEASE) movement_B (1, 1, 1, rotationSpeed, transitionProgress, angle_f, axis_of_rotation, isTransitioning, cube_positions_index, cube_positions_index_previous, cube_positions_index_next);
-            if (currentKeyState_5 == GLFW_PRESS && previousKeyState_5 == GLFW_RELEASE) movement_R (1, 1, 1, rotationSpeed, transitionProgress, angle_f, axis_of_rotation, isTransitioning, cube_positions_index, cube_positions_index_previous, cube_positions_index_next);
-            if (currentKeyState_6 == GLFW_PRESS && previousKeyState_6 == GLFW_RELEASE) movement_L (1, 1, 1, rotationSpeed, transitionProgress, angle_f, axis_of_rotation, isTransitioning, cube_positions_index, cube_positions_index_previous, cube_positions_index_next);
+            if (currentKeyState_SHIFT == GLFW_PRESS ) S = -1;
+            if (currentKeyState_W == GLFW_PRESS && previousKeyState_W == GLFW_RELEASE) movement_U (1, 1, 1*S, rotationSpeed, transitionProgress, angle_f, axis_of_rotation, isTransitioning, cube_positions_index, cube_positions_index_previous, cube_positions_index_next);
+            if (currentKeyState_F == GLFW_PRESS && previousKeyState_F == GLFW_RELEASE) movement_D (1, 1, 1*S, rotationSpeed, transitionProgress, angle_f, axis_of_rotation, isTransitioning, cube_positions_index, cube_positions_index_previous, cube_positions_index_next);
+            if (currentKeyState_S == GLFW_PRESS && previousKeyState_S == GLFW_RELEASE) movement_F (1, 1, 1*S, rotationSpeed, transitionProgress, angle_f, axis_of_rotation, isTransitioning, cube_positions_index, cube_positions_index_previous, cube_positions_index_next);
+            if (currentKeyState_R == GLFW_PRESS && previousKeyState_R == GLFW_RELEASE) movement_B (1, 1, 1*S, rotationSpeed, transitionProgress, angle_f, axis_of_rotation, isTransitioning, cube_positions_index, cube_positions_index_previous, cube_positions_index_next);
+            if (currentKeyState_D == GLFW_PRESS && previousKeyState_D == GLFW_RELEASE) movement_R (1, 1, 1*S, rotationSpeed, transitionProgress, angle_f, axis_of_rotation, isTransitioning, cube_positions_index, cube_positions_index_previous, cube_positions_index_next);
+            if (currentKeyState_A == GLFW_PRESS && previousKeyState_A == GLFW_RELEASE) movement_L (1, 1, 1*S, rotationSpeed, transitionProgress, angle_f, axis_of_rotation, isTransitioning, cube_positions_index, cube_positions_index_previous, cube_positions_index_next);
 
             if (currentKeyState_RIGHT == GLFW_PRESS && previousKeyState_RIGHT == GLFW_RELEASE) movement_Y(1, 1, 1, rotationSpeed, transitionProgress, angle_f, axis_of_rotation, isTransitioning, cube_positions_index, cube_positions_index_previous, cube_positions_index_next);
             if (currentKeyState_LEFT  == GLFW_PRESS && previousKeyState_LEFT  == GLFW_RELEASE) movement_Y(1, 1,-1, rotationSpeed, transitionProgress, angle_f, axis_of_rotation, isTransitioning, cube_positions_index, cube_positions_index_previous, cube_positions_index_next);
@@ -292,11 +303,12 @@ int main(){
         }
 
         // KEYBOARD STATE
-        previousKeyState_Space = currentKeyState_Space;
         previousKeyState_W = currentKeyState_W;
         previousKeyState_A = currentKeyState_A;
         previousKeyState_S = currentKeyState_S;
         previousKeyState_D = currentKeyState_D;
+        previousKeyState_F = currentKeyState_F;
+        previousKeyState_R = currentKeyState_R;
 
         previousKeyState_1 = currentKeyState_1;
         previousKeyState_2 = currentKeyState_2;
@@ -309,6 +321,9 @@ int main(){
         previousKeyState_LEFT  = currentKeyState_LEFT;
         previousKeyState_UP    = currentKeyState_UP;
         previousKeyState_DOWN  = currentKeyState_DOWN;
+
+        previousKeyState_SHIFT = currentKeyState_SHIFT;
+        previousKeyState_Space = currentKeyState_Space;
 
         // SWAP BUFFERS
         glfwSwapBuffers(window);
@@ -327,13 +342,13 @@ void processInput(GLFWwindow* window) {
     if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
         glfwSetWindowShouldClose(window, true);
     if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
-        camera.ProcessKeyboard(FORWARD, deltaTime);
+        //camera.ProcessKeyboard(FORWARD, deltaTime);
     if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS)
-        camera.ProcessKeyboard(BACKWARD, deltaTime);
+        //camera.ProcessKeyboard(BACKWARD, deltaTime);
     if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS)
-        camera.ProcessKeyboard(LEFT, deltaTime);
+        //camera.ProcessKeyboard(LEFT, deltaTime);
     if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
-        camera.ProcessKeyboard(RIGHT, deltaTime);
+        //camera.ProcessKeyboard(RIGHT, deltaTime);
     if (glfwGetKey(window, GLFW_KEY_SPACE) == GLFW_PRESS)
     //    camera.ProcessKeyboard(UP, deltaTime);
     if (glfwGetKey(window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS)
