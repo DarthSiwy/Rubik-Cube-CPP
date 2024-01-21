@@ -16,8 +16,8 @@ void make_is_transtioning(int isTransitioning[], int cube_positions_index[], con
 void change_cube_postions_index(int cube_positions_index_previous[], int cube_positions_index_next[], int cube_positions_index[], std::vector<int>& indexes_to_change) {
     int number_of_elements = 4;
     for (int i = 0; i < number_of_elements; i++) cube_positions_index_previous[indexes_to_change[i]] = cube_positions_index[indexes_to_change[i]];
-    for (int i = 0; i < number_of_elements; i++) cube_positions_index_next[indexes_to_change[(i + 1) % 4]] = cube_positions_index_previous[indexes_to_change[i]];
-    for (int i = 0; i < number_of_elements; i++) cube_positions_index[indexes_to_change[i]] = cube_positions_index_next[indexes_to_change[i]];
+    for (int i = 0; i < number_of_elements; i++) cube_positions_index[indexes_to_change[(i + 1) % 4]] = cube_positions_index_previous[indexes_to_change[i]];
+    //for (int i = 0; i < number_of_elements; i++) cube_positions_index[indexes_to_change[i]] = cube_positions_index_next[indexes_to_change[i]];
 }
 
 // ROTATIONS
