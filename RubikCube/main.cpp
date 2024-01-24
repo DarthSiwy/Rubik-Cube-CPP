@@ -460,8 +460,7 @@ int main(){
         if (mixing == 1) {
             std::uniform_int_distribution<int> distribution(1, 6);
             if (currentFrame - lastTaskTime_mixing >= 0.2f) {
-                if (transitionProgress == 0.0f)
-                {
+                if (transitionProgress == 0.0f){
                     move = distribution(gen);
                     mix++;
                 }
@@ -474,9 +473,9 @@ int main(){
             }
         }
         
-        system("cls");
-        std::cout << "demo_mode: " << demo_mode << std::endl;
-        std::cout << "mixing: " << mixing << std::endl;
+        //system("cls");
+        //std::cout << "demo_mode: " << demo_mode << std::endl;
+        //std::cout << "mixing: " << mixing << std::endl;
         //std::cout << "demo_mode: " << demo_mode << std::endl;
 
         //animation = 0;
