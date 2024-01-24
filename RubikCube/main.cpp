@@ -14,11 +14,15 @@
 #include "cubes.h"
 #include "stickers.h"
 
+
 #include <map>
 #include <cmath>
 #include <string>
 #include <vector>
+#include <random>
 #include <iostream>
+#include <chrono>
+#include <thread>
 
 #include FT_FREETYPE_H
 
@@ -49,9 +53,7 @@ float lastX = SCR_WIDTH / 2.0f;
 float lastY = SCR_HEIGHT / 2.0f;
 bool firstMouse = true;
 
-// TIMING
-float deltaTime = 0.0f;
-float lastFrame = 0.0f;
+
 
 // SPEED
 extern float speed_1 = 1.0f;
@@ -86,18 +88,15 @@ int main(){
     textShader.use();
     glUniformMatrix4fv(glGetUniformLocation(textShader.ID, "projection"), 1, GL_FALSE, glm::value_ptr(projection));
     FT_Library ft;
-    // All functions return a value different than 0 whenever an error occurred
     if (FT_Init_FreeType(&ft)){
         std::cout << "ERROR::FREETYPE: Could not init FreeType Library" << std::endl;
         return -1;
     }
-    // find path to font
     std::string font_name = ("resources/fonts/font_1.ttf");
     if (font_name.empty()){
         std::cout << "ERROR::FREETYPE: Failed to load font_name" << std::endl;
         return -1;
     }
-    // load font as face
     FT_Face face;
     if (FT_New_Face(ft, font_name.c_str(), 0, &face)) {
         std::cout << "ERROR::FREETYPE: Failed to load font" << std::endl;
@@ -135,7 +134,6 @@ int main(){
             glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
             glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
             glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-            // now store character for later use
             Character character = {
                 texture,
                 glm::ivec2(face->glyph->bitmap.width, face->glyph->bitmap.rows),
@@ -146,7 +144,6 @@ int main(){
         }
         glBindTexture(GL_TEXTURE_2D, 0);
     }
-    // destroy FreeType once we're finished
     FT_Done_Face(face);
     FT_Done_FreeType(ft);
     glGenVertexArrays(1, &text_VAO);
@@ -235,10 +232,14 @@ int main(){
     int number_of_elements = 0;
     int axis_of_rotation = 0;
     int animation = 1;
+    int mixing = 0;
+    int mix = 0;
     
     int S = 1;
     int current_speed = 1;
-    int demo_mode = 0;
+    int demo_mode = 1;
+    std::random_device rd;
+    std::mt19937 gen(rd());
 
     glm::vec3 axis_of_rotation_vec = glm::vec3(0.0f, 0.0f, 0.0f);
 
@@ -249,6 +250,9 @@ int main(){
     int previousKeyState_D = GLFW_RELEASE;
     int previousKeyState_R = GLFW_RELEASE;
     int previousKeyState_F = GLFW_RELEASE;
+    int previousKeyState_P = GLFW_RELEASE;
+    int previousKeyState_O = GLFW_RELEASE;
+    int previousKeyState_M = GLFW_RELEASE;
     int previousKeyState_1 = GLFW_RELEASE;
     int previousKeyState_2 = GLFW_RELEASE;
     int previousKeyState_3 = GLFW_RELEASE;
@@ -278,6 +282,12 @@ int main(){
     const float fixedDeltaTime = 1.0f / targetFPS;
     float accumulatedTime = 0.0f;
 
+    // TIMING
+    float deltaTime = 0.0f;
+    float lastFrame = 0.0f;
+    float lastTaskTime_demo = 0.0f;
+    float lastTaskTime_mixing = 0.0f;
+
     // RENDER LOOP      ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
     // RENDER LOOP      ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
     // RENDER LOOP      ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -290,8 +300,11 @@ int main(){
         lastFrame = currentFrame;
         processInput(window);
         mainShader.use();
-
         
+        
+        // Perform task every second
+        
+
 
         glEnable(GL_DEPTH_TEST);
         glDisable(GL_BLEND);
@@ -358,15 +371,21 @@ int main(){
 
         // TEXT PRINTING
         RenderText(textShader, "Current speed: " + std::to_string(current_speed), 25.0f, 1000.0f, 0.5f, glm::vec3(0.5, 0.8f, 0.2f));
-        RenderText(textShader, "Current speed: " + std::to_string(current_speed), 25.0f, 970.0f, 0.5f, glm::vec3(0.5, 0.8f, 0.2f));
+        RenderText(textShader, "Demo mode: " + std::to_string(demo_mode), 25.0f, 970.0f, 0.5f, glm::vec3(0.5, 0.8f, 0.2f));
+
+
+
 
         // KEYBOARD STATE 
         int currentKeyState_W = glfwGetKey(window, GLFW_KEY_W);
         int currentKeyState_A = glfwGetKey(window, GLFW_KEY_A);
         int currentKeyState_S = glfwGetKey(window, GLFW_KEY_S);
         int currentKeyState_D = glfwGetKey(window, GLFW_KEY_D);
+        int currentKeyState_M = glfwGetKey(window, GLFW_KEY_M);
         int currentKeyState_R = glfwGetKey(window, GLFW_KEY_R);
         int currentKeyState_F = glfwGetKey(window, GLFW_KEY_F);
+        int currentKeyState_O = glfwGetKey(window, GLFW_KEY_O);
+        int currentKeyState_P = glfwGetKey(window, GLFW_KEY_P);
         int currentKeyState_1 = glfwGetKey(window, GLFW_KEY_1);
         int currentKeyState_2 = glfwGetKey(window, GLFW_KEY_2);
         int currentKeyState_3 = glfwGetKey(window, GLFW_KEY_3);
@@ -381,8 +400,15 @@ int main(){
         int currentKeyState_SHIFT = glfwGetKey(window, GLFW_KEY_LEFT_SHIFT);
 
         // KEYBOARD MOVEMENTS 
+        S = 1; move = 0;
+
+        if (currentKeyState_1 == GLFW_PRESS && previousKeyState_1 == GLFW_RELEASE) speed(1, current_speed, speed_1, speed_2, animation);
+        if (currentKeyState_2 == GLFW_PRESS && previousKeyState_2 == GLFW_RELEASE) speed(2, current_speed, speed_1, speed_2, animation);
+        if (currentKeyState_3 == GLFW_PRESS && previousKeyState_3 == GLFW_RELEASE) speed(3, current_speed, speed_1, speed_2, animation);
+        if (currentKeyState_4 == GLFW_PRESS && previousKeyState_4 == GLFW_RELEASE) speed(4, current_speed, speed_1, speed_2, animation);
+        if (currentKeyState_5 == GLFW_PRESS && previousKeyState_5 == GLFW_RELEASE) speed(5, current_speed, speed_1, speed_2, animation);
+
         if (transitionProgress == 0.0f){
-            S = 1;
             if (currentKeyState_SHIFT == GLFW_PRESS ) S = -1;
             if (currentKeyState_W == GLFW_PRESS && previousKeyState_W == GLFW_RELEASE) move = 1;
             if (currentKeyState_F == GLFW_PRESS && previousKeyState_F == GLFW_RELEASE) move = 2;
@@ -394,14 +420,65 @@ int main(){
             if (currentKeyState_DOWN == GLFW_PRESS && previousKeyState_DOWN == GLFW_RELEASE)    move = 9; 
             if (currentKeyState_RIGHT == GLFW_PRESS && previousKeyState_RIGHT == GLFW_RELEASE)  move = 8;
             if (currentKeyState_LEFT == GLFW_PRESS && previousKeyState_LEFT == GLFW_RELEASE)    move =10; 
+
+            if (currentKeyState_M == GLFW_PRESS && previousKeyState_M == GLFW_RELEASE){
+                mixing = 1;
+                demo_mode = 0;
+            }
+        }
+  
+        // DEMO MODE
+        if (demo_mode == 1 && mixing==0) {
+            std::uniform_int_distribution<int> distribution(1, 8);
+            if (currentFrame - lastTaskTime_demo >= 0.4f) {
+                if (transitionProgress == 0.0f) move = distribution(gen);
+                lastTaskTime_demo = currentFrame;
+            }
+            speed(1, current_speed, speed_1, speed_2, animation);
+        }
+        if (currentKeyState_O == GLFW_PRESS && previousKeyState_O == GLFW_RELEASE && demo_mode==0) {
+            if (demo_mode == 0) demo_mode = 1;
+            previousKeyState_O = currentKeyState_O;
+        }
+        if (currentKeyState_O == GLFW_PRESS && previousKeyState_O == GLFW_RELEASE && demo_mode==1) {
+            if (demo_mode == 1) demo_mode = 0;
+            previousKeyState_O = currentKeyState_O;
+        }
+        
+        // CUBE RESET
+        if (currentKeyState_P == GLFW_PRESS && previousKeyState_P == GLFW_RELEASE && transitionProgress == 0.0f) {
+            move = 0;
+            demo_mode = 0;
+            make_vertices(vertices_main);
+            cube_indexes(cube_positions_index, cube_positions_index_previous, cube_positions_index_next, vertices, vertices_main);
+            move_cubes(vertices, vertices_main);
+            make_walls_black(vertices);
+            create_stickers(stickers);
         }
 
-        if (currentKeyState_1 == GLFW_PRESS && previousKeyState_1 == GLFW_RELEASE) speed(1, current_speed, speed_1, speed_2, animation);
-        if (currentKeyState_2 == GLFW_PRESS && previousKeyState_2 == GLFW_RELEASE) speed(2, current_speed, speed_1, speed_2, animation);
-        if (currentKeyState_3 == GLFW_PRESS && previousKeyState_3 == GLFW_RELEASE) speed(3, current_speed, speed_1, speed_2, animation);
-        if (currentKeyState_4 == GLFW_PRESS && previousKeyState_4 == GLFW_RELEASE) speed(4, current_speed, speed_1, speed_2, animation);
-        if (currentKeyState_5 == GLFW_PRESS && previousKeyState_5 == GLFW_RELEASE) speed(5, current_speed, speed_1, speed_2, animation);
+        // MIXING 
+        if (mixing == 1) {
+            std::uniform_int_distribution<int> distribution(1, 6);
+            if (currentFrame - lastTaskTime_mixing >= 0.2f) {
+                if (transitionProgress == 0.0f)
+                {
+                    move = distribution(gen);
+                    mix++;
+                }
+                lastTaskTime_mixing = currentFrame;
+            }
+            speed(2, current_speed, speed_1, speed_2, animation);
+            if (mix == 20) {
+                mix = 0;
+                mixing = 0;
+            }
+        }
         
+        system("cls");
+        std::cout << "demo_mode: " << demo_mode << std::endl;
+        std::cout << "mixing: " << mixing << std::endl;
+        //std::cout << "demo_mode: " << demo_mode << std::endl;
+
         //animation = 0;
         if (move == 9)  {move = 7;  S = -1;}
         if (move == 10) {move = 8,  S = -1;}
@@ -413,7 +490,7 @@ int main(){
         if (move == 6)  movements(0, animation, 1 * S, stickers, move, rotationSpeed, 1, transitionProgress, angle_f, axis_of_rotation, isTransitioning, cube_positions_index, cube_positions_index_previous, cube_positions_index_next);
         if (move == 7)  movements(0, animation, 1 * S, stickers, move, rotationSpeed, 2, transitionProgress, angle_f, axis_of_rotation, isTransitioning, cube_positions_index, cube_positions_index_previous, cube_positions_index_next);
         if (move == 8)  movements(0, animation, 1 * S, stickers, move, rotationSpeed, 2, transitionProgress, angle_f, axis_of_rotation, isTransitioning, cube_positions_index, cube_positions_index_previous, cube_positions_index_next);
-        move = 0;
+        
                
 
         // SPACE LOOK
@@ -439,6 +516,9 @@ int main(){
         previousKeyState_D = currentKeyState_D;
         previousKeyState_F = currentKeyState_F;
         previousKeyState_R = currentKeyState_R;
+        previousKeyState_M = currentKeyState_M;
+        previousKeyState_P = currentKeyState_P;
+        previousKeyState_O = currentKeyState_O;
         previousKeyState_1 = currentKeyState_1;
         previousKeyState_2 = currentKeyState_2;
         previousKeyState_3 = currentKeyState_3;
