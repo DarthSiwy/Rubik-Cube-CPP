@@ -21,6 +21,27 @@ A simple C++ program using OpenGL to create a 3D representation of a Rubik's Cub
 - change of speed
 - move counter
 
+### Controls
+# Moves clockwise
+- W - UP
+- A - LEFT
+- S - FRONT
+- D - RIGHT
+- R - BACK
+- F - DOWN
+
+- ARROWS - rotate entire cube
+- 1-5 - change speed
+- SPACE - change view
+
+- O - demo mode
+- P - resetting the cube
+- N - resetting counter
+- M - scrambling the cube
+
+- ESC - exit
+- H - tooghle help menu
+
 ## Getting Started
 A simple C++ program using OpenGL to create a 3D representation of a Rubik's Cube.
 
@@ -33,3 +54,4 @@ A simple C++ program using OpenGL to create a 3D representation of a Rubik's Cub
 1. Clone the repository:
    git clone --depth 1 https://github.com/yourusername/opengl-rubiks-cube.git
    git clone https://github.com/yourusername/opengl-rubiks-cube.git
+
