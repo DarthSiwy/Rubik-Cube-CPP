@@ -237,7 +237,7 @@ int main(){
     
     int S = 1;
     int current_speed = 1;
-    int demo_mode = 1;
+    int demo_mode = 0;
     std::random_device rd;
     std::mt19937 gen(rd());
 
@@ -300,11 +300,6 @@ int main(){
         lastFrame = currentFrame;
         processInput(window);
         mainShader.use();
-        
-        
-        // Perform task every second
-        
-
 
         glEnable(GL_DEPTH_TEST);
         glDisable(GL_BLEND);
@@ -314,10 +309,10 @@ int main(){
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
         // Draw the axis lines
-        glm::mat4 model = glm::mat4(1.0f);
-        mainShader.setMat4("model", model);
-        glBindVertexArray(axisVAO);
-        glDrawArrays(GL_LINES, 0, 6);
+        //glm::mat4 model = glm::mat4(1.0f);
+        //mainShader.setMat4("model", model);
+        //glBindVertexArray(axisVAO);
+        //glDrawArrays(GL_LINES, 0, 6);
 
         // Activate Textures
         glActiveTexture(GL_TEXTURE0);
@@ -372,9 +367,17 @@ int main(){
         // TEXT PRINTING
         RenderText(textShader, "Current speed: " + std::to_string(current_speed), 25.0f, 1000.0f, 0.5f, glm::vec3(0.5, 0.8f, 0.2f));
         RenderText(textShader, "Demo mode: " + std::to_string(demo_mode), 25.0f, 970.0f, 0.5f, glm::vec3(0.5, 0.8f, 0.2f));
-
-
-
+        RenderText(textShader, "W - UP", 25.0f, 500.0f, 0.5f, glm::vec3(0.5, 0.8f, 0.2f));
+        RenderText(textShader, "A - LEFT", 25.0f, 470.0f, 0.5f, glm::vec3(0.5, 0.8f, 0.2f));
+        RenderText(textShader, "S - FRONT", 25.0f, 440.0f, 0.5f, glm::vec3(0.5, 0.8f, 0.2f));
+        RenderText(textShader, "D - RIGHT", 25.0f, 410.0f, 0.5f, glm::vec3(0.5, 0.8f, 0.2f));
+        RenderText(textShader, "R - BACK", 25.0f, 380.0f, 0.5f, glm::vec3(0.5, 0.8f, 0.2f));
+        RenderText(textShader, "F - DOWN", 25.0f, 350.0f, 0.5f, glm::vec3(0.5, 0.8f, 0.2f));
+        RenderText(textShader, "1-5 - SPEED", 25.0f, 320.0f, 0.5f, glm::vec3(0.5, 0.8f, 0.2f));
+        RenderText(textShader, "O - DEMO MODE", 25.0f, 290.0f, 0.5f, glm::vec3(0.5, 0.8f, 0.2f));
+        RenderText(textShader, "P - RESET", 25.0f, 260.0f, 0.5f, glm::vec3(0.5, 0.8f, 0.2f));
+        RenderText(textShader, "M - MIX", 25.0f, 230.0f, 0.5f, glm::vec3(0.5, 0.8f, 0.2f));
+        RenderText(textShader, "ARROWS - CHANGE POSITION", 25.0f, 200.0f, 0.5f, glm::vec3(0.5, 0.8f, 0.2f));
 
         // KEYBOARD STATE 
         int currentKeyState_W = glfwGetKey(window, GLFW_KEY_W);
@@ -478,7 +481,6 @@ int main(){
         //std::cout << "mixing: " << mixing << std::endl;
         //std::cout << "demo_mode: " << demo_mode << std::endl;
 
-        //animation = 0;
         if (move == 9)  {move = 7;  S = -1;}
         if (move == 10) {move = 8,  S = -1;}
         if (move == 1)  movements(0, animation, 1 * S, stickers, move, rotationSpeed, 1, transitionProgress, angle_f, axis_of_rotation, isTransitioning, cube_positions_index, cube_positions_index_previous, cube_positions_index_next);
@@ -489,8 +491,6 @@ int main(){
         if (move == 6)  movements(0, animation, 1 * S, stickers, move, rotationSpeed, 1, transitionProgress, angle_f, axis_of_rotation, isTransitioning, cube_positions_index, cube_positions_index_previous, cube_positions_index_next);
         if (move == 7)  movements(0, animation, 1 * S, stickers, move, rotationSpeed, 2, transitionProgress, angle_f, axis_of_rotation, isTransitioning, cube_positions_index, cube_positions_index_previous, cube_positions_index_next);
         if (move == 8)  movements(0, animation, 1 * S, stickers, move, rotationSpeed, 2, transitionProgress, angle_f, axis_of_rotation, isTransitioning, cube_positions_index, cube_positions_index_previous, cube_positions_index_next);
-        
-               
 
         // SPACE LOOK
         if (currentKeyState_Space == GLFW_PRESS && previousKeyState_Space == GLFW_RELEASE && look_position == 0) {

@@ -1,1 +1,11 @@
-﻿  RubikCube.vcxproj -> C:\Users\Piotr\source\repos\Rubik-Cube-CPP\RubikCube\x64\Debug\RubikCube.exe
+﻿  main.cpp
+C:\Users\Piotr\source\repos\Rubik-Cube-CPP\RubikCube\main.cpp(330,36): warning C4018: '<': signed/unsigned mismatch
+C:\Users\Piotr\source\repos\Rubik-Cube-CPP\RubikCube\main.cpp(335,61): warning C4305: 'argument': truncation from 'double' to 'T'
+          with
+          [
+              T=float
+          ]
+C:\Users\Piotr\source\repos\Rubik-Cube-CPP\RubikCube\main.cpp(201,28): warning C4101: 'texture2': unreferenced local variable
+  stickers.cpp
+  Generating Code...
+  RubikCube.vcxproj -> C:\Users\Piotr\source\repos\Rubik-Cube-CPP\RubikCube\x64\Debug\RubikCube.exe
