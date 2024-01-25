@@ -23,6 +23,7 @@
 
 #include FT_FREETYPE_H
 
+
 extern const unsigned int SCR_WIDTH = 1920;
 extern const unsigned int SCR_HEIGHT = 1080;
 
