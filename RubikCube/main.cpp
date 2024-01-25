@@ -50,8 +50,6 @@ float lastX = SCR_WIDTH / 2.0f;
 float lastY = SCR_HEIGHT / 2.0f;
 bool firstMouse = true;
 
-
-
 // SPEED
 extern float speed_1 = 1.0f;
 extern float speed_2 = 1.0f;
