@@ -370,14 +370,14 @@ int main(){
         RenderText(textShader, "Current speed: " + std::to_string(current_speed), 25.0f, 1000.0f, 0.5f, glm::vec3(0.5, 0.8f, 0.2f));
         RenderText(textShader, "Demo mode: " + std::to_string(demo_mode), 25.0f, 970.0f, 0.5f, glm::vec3(0.5, 0.8f, 0.2f));
         RenderText(textShader, "Moves: " + std::to_string(counter), 25.0f, 940.0f, 0.5f, glm::vec3(0.5, 0.8f, 0.2f));
-        RenderText(textShader, "H - HELP", 25.0f, 140.0f, 0.5f, glm::vec3(0.5, 0.8f, 0.2f));
         if (help == 1) {
             distance = 540;
-            for (int i = 0; i < 12; i++){
+            for (int i = 0; i < 14; i++){
                 distance -= 30.0f;
                 RenderText(textShader, text_vector[i], 25.0f, distance, 0.5f, glm::vec3(0.5, 0.8f, 0.2f));
             }
         }
+        RenderText(textShader, "H - HELP", 25.0f, 80.0f, 0.5f, glm::vec3(0.5, 0.8f, 0.2f));
 
         // KEYBOARD STATE 
         int currentKeyState_W = glfwGetKey(window, GLFW_KEY_W);

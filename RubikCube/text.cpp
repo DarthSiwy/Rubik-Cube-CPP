@@ -14,5 +14,8 @@ void make_text_vector_help(std::vector<std::string>& text_vector) {
     text_vector.push_back("P - RESET");
     text_vector.push_back("M - MIX");
     text_vector.push_back("N - RESET COUNTER");
+    text_vector.push_back("SPACE - CHANGE VIEW");
     text_vector.push_back("ARROWS - CHANGE POSITION");
+    text_vector.push_back("ESC - EXIT");
+
 }
