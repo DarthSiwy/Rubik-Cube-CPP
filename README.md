@@ -52,6 +52,6 @@ A simple C++ program using OpenGL to create a 3D representation of a Rubik's Cub
 ### Building and Running
 
 1. Clone the repository:
-   git clone --depth 1 https://github.com/yourusername/opengl-rubiks-cube.git
-   git clone https://github.com/yourusername/opengl-rubiks-cube.git
+  - git clone --depth 1 https://github.com/yourusername/opengl-rubiks-cube.git
+  - git clone https://github.com/yourusername/opengl-rubiks-cube.git
 
