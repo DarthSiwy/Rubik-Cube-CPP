@@ -157,6 +157,7 @@
     <ClCompile Include="movements.cpp" />
     <ClCompile Include="rotations.cpp" />
     <ClCompile Include="stickers.cpp" />
+    <ClCompile Include="text.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="camera.h" />
@@ -166,6 +167,7 @@
     <ClInclude Include="shader_m.h" />
     <ClInclude Include="stb_image.h" />
     <ClInclude Include="stickers.h" />
+    <ClInclude Include="text.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="fragment_shader" />

@@ -13,6 +13,7 @@
 #include "movements.h"
 #include "cubes.h"
 #include "stickers.h"
+#include "text.h"
 
 #include <map>
 #include <cmath>
@@ -22,8 +23,6 @@
 #include <iostream>
 
 #include FT_FREETYPE_H
-
-
 
 extern const unsigned int SCR_WIDTH = 1920;
 extern const unsigned int SCR_HEIGHT = 1080;
@@ -61,7 +60,7 @@ int main(){
     glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
     glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
-    GLFWwindow* window = glfwCreateWindow(SCR_WIDTH, SCR_HEIGHT, "LearnOpenGL", NULL, NULL);
+    GLFWwindow* window = glfwCreateWindow(SCR_WIDTH, SCR_HEIGHT, "Rubik Cube", NULL, NULL);
     if (window == NULL) {
         std::cout << "Failed to create GLFW window" << std::endl;
         glfwTerminate();
@@ -195,7 +194,7 @@ int main(){
     }
 
     // TEXTURES
-    unsigned int texture1, texture2;
+    unsigned int texture1;
     unsigned char* data;
     int width, height, nrChannels;
     glGenTextures(1, &texture1);
@@ -216,29 +215,6 @@ int main(){
 
     // -----------------------------------------------------------------------------------------
     // VARIABLES 
-    int isTransitioning[27];
-    for (int i = 0; i < 27; i++) isTransitioning[i] = 0;
-
-    // ANIMATION
-    float transitionDuration = 1.0f; 
-    float transitionProgress = 0.0f; 
-    float rotationSpeed = 1.0f;
-    float angle_f = 1.0f;
-    int look_position = 0;
-    int redner_cubes_number = 26;
-    int number_of_elements = 0;
-    int axis_of_rotation = 0;
-    int animation = 1;
-    int mixing = 0;
-    int mix = 0;
-    
-    int S = 1;
-    int current_speed = 1;
-    int demo_mode = 0;
-    std::random_device rd;
-    std::mt19937 gen(rd());
-
-    glm::vec3 axis_of_rotation_vec = glm::vec3(0.0f, 0.0f, 0.0f);
 
     // KEYBOARD
     int previousKeyState_W = GLFW_RELEASE;
@@ -248,7 +224,9 @@ int main(){
     int previousKeyState_R = GLFW_RELEASE;
     int previousKeyState_F = GLFW_RELEASE;
     int previousKeyState_P = GLFW_RELEASE;
+    int previousKeyState_H = GLFW_RELEASE;
     int previousKeyState_O = GLFW_RELEASE;
+    int previousKeyState_N = GLFW_RELEASE;
     int previousKeyState_M = GLFW_RELEASE;
     int previousKeyState_1 = GLFW_RELEASE;
     int previousKeyState_2 = GLFW_RELEASE;
@@ -257,39 +235,70 @@ int main(){
     int previousKeyState_5 = GLFW_RELEASE;
     int previousKeyState_6 = GLFW_RELEASE;
     int previousKeyState_RIGHT = GLFW_RELEASE;
-    int previousKeyState_UP    = GLFW_RELEASE;
-    int previousKeyState_DOWN  = GLFW_RELEASE;
-    int previousKeyState_LEFT  = GLFW_RELEASE;
+    int previousKeyState_UP = GLFW_RELEASE;
+    int previousKeyState_DOWN = GLFW_RELEASE;
+    int previousKeyState_LEFT = GLFW_RELEASE;
     int previousKeyState_SHIFT = GLFW_RELEASE;
     int previousKeyState_Space = GLFW_RELEASE;
+
+    // ANIMATION
+    int isTransitioning[27];
+    int axis_of_rotation = 0;
+    float transitionDuration = 1.0f;
+    float transitionProgress = 0.0f;
+    float rotationSpeed = 1.0f;
+    float angle_f = 1.0f;
+    int S = 1;
+    for (int i = 0; i < 27; i++) isTransitioning[i] = 0;
+    glm::vec3 axis_of_rotation_vec = glm::vec3(0.0f, 0.0f, 0.0f);
+
+    // RENDER
+    int redner_cubes_number = 26;
+    int number_of_elements = 0;
+    redner_cubes_number++;
+    
+    // MODE 
+    int animation = 1;
+    int mixing = 0;
+    int mix = 0;
+    float distance=0.0f;
+    int current_speed = 1;
+    int demo_mode = 0;
+    int counter = 0;
+    int help = 1;
+    
+    // RANDOM
+    std::random_device rd;
+    std::mt19937 gen(rd());
 
     // CAMERA POSITION
     camera.Yaw -= 30.0f;
     camera.Pitch-= 30.0f;
     camera.updateCameraVectors();
+    int look_position = 0;
 
     // STICKERS 
     int stickers[54];
     create_stickers(stickers);
     //print_stickers(stickers);
 
-    speed(1, current_speed, speed_1, speed_2, animation);
-
-    const float targetFPS = 60.0f;
-    const float fixedDeltaTime = 1.0f / targetFPS;
-    float accumulatedTime = 0.0f;
+    // TEXT
+    std::vector<std::string> text_vector;
+    make_text_vector_help(text_vector);
 
     // TIMING
     float deltaTime = 0.0f;
     float lastFrame = 0.0f;
     float lastTaskTime_demo = 0.0f;
     float lastTaskTime_mixing = 0.0f;
+    speed(1, current_speed, speed_1, speed_2, animation); 
+
+    // RENDERING
+    glfwSwapInterval(1);
 
     // RENDER LOOP      ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
     // RENDER LOOP      ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
     // RENDER LOOP      ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-    redner_cubes_number++;
-    glfwSwapInterval(1);
     while (!glfwWindowShouldClose(window)) {
         // TIME
         float currentFrame = static_cast<float>(glfwGetTime());
@@ -330,16 +339,13 @@ int main(){
             glBindVertexArray(VAO[i]);
             glm::mat4 model = glm::mat4(1.0f);
             if (i == 0) model = glm::scale(model, glm::vec3(0.1));
-
             // TRANSITION
             if (isTransitioning[i] == 1) {
                 float angle = glm::radians(angle_f) * transitionProgress;
                 if (axis_of_rotation != 0) axis_of_rotation_vec[axis_of_rotation-1] = 1.0f;
-
                 model = glm::rotate(model, angle, axis_of_rotation_vec);
                 axis_of_rotation_vec = glm::vec3(0.0f, 0.0f, 0.0f);
             } 
-            
             // UPDATE TRANSITION PROGRESS
             if (isTransitioning[i] == 1) {
                 transitionProgress += deltaTime * rotationSpeed;
@@ -355,7 +361,6 @@ int main(){
                     axis_of_rotation = 0;
                 }
             }
-
             // SET CURRENT MODEL 
             mainShader.setMat4("model", model);
             glDrawArrays(GL_TRIANGLES, 0, 36);
@@ -364,17 +369,15 @@ int main(){
         // TEXT PRINTING
         RenderText(textShader, "Current speed: " + std::to_string(current_speed), 25.0f, 1000.0f, 0.5f, glm::vec3(0.5, 0.8f, 0.2f));
         RenderText(textShader, "Demo mode: " + std::to_string(demo_mode), 25.0f, 970.0f, 0.5f, glm::vec3(0.5, 0.8f, 0.2f));
-        RenderText(textShader, "W - UP", 25.0f, 500.0f, 0.5f, glm::vec3(0.5, 0.8f, 0.2f));
-        RenderText(textShader, "A - LEFT", 25.0f, 470.0f, 0.5f, glm::vec3(0.5, 0.8f, 0.2f));
-        RenderText(textShader, "S - FRONT", 25.0f, 440.0f, 0.5f, glm::vec3(0.5, 0.8f, 0.2f));
-        RenderText(textShader, "D - RIGHT", 25.0f, 410.0f, 0.5f, glm::vec3(0.5, 0.8f, 0.2f));
-        RenderText(textShader, "R - BACK", 25.0f, 380.0f, 0.5f, glm::vec3(0.5, 0.8f, 0.2f));
-        RenderText(textShader, "F - DOWN", 25.0f, 350.0f, 0.5f, glm::vec3(0.5, 0.8f, 0.2f));
-        RenderText(textShader, "1-5 - SPEED", 25.0f, 320.0f, 0.5f, glm::vec3(0.5, 0.8f, 0.2f));
-        RenderText(textShader, "O - DEMO MODE", 25.0f, 290.0f, 0.5f, glm::vec3(0.5, 0.8f, 0.2f));
-        RenderText(textShader, "P - RESET", 25.0f, 260.0f, 0.5f, glm::vec3(0.5, 0.8f, 0.2f));
-        RenderText(textShader, "M - MIX", 25.0f, 230.0f, 0.5f, glm::vec3(0.5, 0.8f, 0.2f));
-        RenderText(textShader, "ARROWS - CHANGE POSITION", 25.0f, 200.0f, 0.5f, glm::vec3(0.5, 0.8f, 0.2f));
+        RenderText(textShader, "Moves: " + std::to_string(counter), 25.0f, 940.0f, 0.5f, glm::vec3(0.5, 0.8f, 0.2f));
+        RenderText(textShader, "H - HELP", 25.0f, 140.0f, 0.5f, glm::vec3(0.5, 0.8f, 0.2f));
+        if (help == 1) {
+            distance = 540;
+            for (int i = 0; i < 12; i++){
+                distance -= 30.0f;
+                RenderText(textShader, text_vector[i], 25.0f, distance, 0.5f, glm::vec3(0.5, 0.8f, 0.2f));
+            }
+        }
 
         // KEYBOARD STATE 
         int currentKeyState_W = glfwGetKey(window, GLFW_KEY_W);
@@ -385,7 +388,9 @@ int main(){
         int currentKeyState_R = glfwGetKey(window, GLFW_KEY_R);
         int currentKeyState_F = glfwGetKey(window, GLFW_KEY_F);
         int currentKeyState_O = glfwGetKey(window, GLFW_KEY_O);
+        int currentKeyState_H = glfwGetKey(window, GLFW_KEY_H);
         int currentKeyState_P = glfwGetKey(window, GLFW_KEY_P);
+        int currentKeyState_N = glfwGetKey(window, GLFW_KEY_N);
         int currentKeyState_1 = glfwGetKey(window, GLFW_KEY_1);
         int currentKeyState_2 = glfwGetKey(window, GLFW_KEY_2);
         int currentKeyState_3 = glfwGetKey(window, GLFW_KEY_3);
@@ -421,6 +426,7 @@ int main(){
             if (currentKeyState_RIGHT == GLFW_PRESS && previousKeyState_RIGHT == GLFW_RELEASE)  move = 8;
             if (currentKeyState_LEFT == GLFW_PRESS && previousKeyState_LEFT == GLFW_RELEASE)    move =10; 
 
+            if (move > 0 && move < 7) counter++;
             if (currentKeyState_M == GLFW_PRESS && previousKeyState_M == GLFW_RELEASE){
                 mixing = 1;
                 demo_mode = 0;
@@ -439,16 +445,33 @@ int main(){
         if (currentKeyState_O == GLFW_PRESS && previousKeyState_O == GLFW_RELEASE && demo_mode==0) {
             if (demo_mode == 0) demo_mode = 1;
             previousKeyState_O = currentKeyState_O;
+            counter = 0;
         }
         if (currentKeyState_O == GLFW_PRESS && previousKeyState_O == GLFW_RELEASE && demo_mode==1) {
             if (demo_mode == 1) demo_mode = 0;
             previousKeyState_O = currentKeyState_O;
+        }
+
+        // HELP
+        if (currentKeyState_H == GLFW_PRESS && previousKeyState_H == GLFW_RELEASE && help == 0) {
+            if (help == 0) help = 1;
+            previousKeyState_H = currentKeyState_H;
+        }
+        if (currentKeyState_H == GLFW_PRESS && previousKeyState_H == GLFW_RELEASE && help == 1) {
+            if (help == 1) help = 0;
+            previousKeyState_H = currentKeyState_H;
+        }
+
+        // COUNTER RESET
+        if (currentKeyState_N == GLFW_PRESS && previousKeyState_N == GLFW_RELEASE && transitionProgress == 0.0f) {
+            counter = 0;
         }
         
         // CUBE RESET
         if (currentKeyState_P == GLFW_PRESS && previousKeyState_P == GLFW_RELEASE && transitionProgress == 0.0f) {
             move = 0;
             demo_mode = 0;
+            counter = 0;
             make_vertices(vertices_main);
             cube_indexes(cube_positions_index, cube_positions_index_previous, cube_positions_index_next, vertices, vertices_main);
             move_cubes(vertices, vertices_main);
@@ -470,13 +493,10 @@ int main(){
             if (mix == 20) {
                 mix = 0;
                 mixing = 0;
+                counter = 0;
+                speed(1, current_speed, speed_1, speed_2, animation);
             }
         }
-        
-        //system("cls");
-        //std::cout << "demo_mode: " << demo_mode << std::endl;
-        //std::cout << "mixing: " << mixing << std::endl;
-        //std::cout << "demo_mode: " << demo_mode << std::endl;
 
         if (move == 9)  {move = 7;  S = -1;}
         if (move == 10) {move = 8,  S = -1;}
@@ -515,6 +535,8 @@ int main(){
         previousKeyState_M = currentKeyState_M;
         previousKeyState_P = currentKeyState_P;
         previousKeyState_O = currentKeyState_O;
+        previousKeyState_H = currentKeyState_H;
+        previousKeyState_N = currentKeyState_N;
         previousKeyState_1 = currentKeyState_1;
         previousKeyState_2 = currentKeyState_2;
         previousKeyState_3 = currentKeyState_3;
