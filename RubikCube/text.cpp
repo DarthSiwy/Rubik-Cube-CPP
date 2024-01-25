@@ -1,6 +1,6 @@
 #include "text.h"
-#include <string>
 
+#include <string>
 
 void make_text_vector_help(std::vector<std::string>& text_vector) {
     text_vector.push_back("W - UP");
