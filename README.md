@@ -21,7 +21,7 @@ A simple C++ program using OpenGL to create a 3D representation of a Rubik's Cub
 - change of speed
 - move counter
 
-# Controls
+## Controls
 ### Moves clockwise
 - W - UP
 - A - LEFT
