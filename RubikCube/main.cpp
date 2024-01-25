@@ -14,15 +14,12 @@
 #include "cubes.h"
 #include "stickers.h"
 
-
 #include <map>
 #include <cmath>
 #include <string>
 #include <vector>
 #include <random>
 #include <iostream>
-#include <chrono>
-#include <thread>
 
 #include FT_FREETYPE_H
 
