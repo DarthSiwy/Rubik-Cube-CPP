@@ -12,10 +12,7 @@ void create_stickers(int stickers[54]) {
     for (int i = 36; i < 45; i++) stickers[i] = 5;
     for (int i = 45; i < 54; i++) stickers[i] = 6;
 
-    stickers[2] = 7;
-    stickers[3] = 8;
-    stickers[20] = 20;
-    //stickers[3] = 8;
+    //for (int i = 0; i < 54; i++) stickers[i] = i;
 }
 
 void print_stickers(int stickers[54]) {
@@ -52,16 +49,42 @@ void movement_stickers(int stickers[54], std::vector<int>& stickers_1, int direc
 }
 
 void movement_stickers_select(int stickers[54], int movement_index, int direction) {
-    std::vector<int> stickers_1 = { 0 };
-    std::vector<int> stickers_2 = { 0 };
+    std::vector<int> stickers_1;
+    std::vector<int> stickers_2;
 
     if (movement_index == 1) {
         stickers_1 = { 0, 1, 2, 5, 8, 7, 6, 3 };
     }   stickers_2 = { 18, 19, 20, 36, 37, 38, 27, 28, 29, 45, 46, 47 };
 
+    if (movement_index == 2) {
+        stickers_1 = { 9, 10, 11, 14, 17, 16, 15, 9 };
+        stickers_2 = { 24, 25, 26, 42, 43, 44, 33, 34, 35, 51, 52, 53 };
+    }
+
+    if (movement_index == 3) {
+        stickers_1 = { 18, 19, 20, 23, 26, 25, 24, 21 };
+        stickers_2 = { 6, 7, 8, 36, 39, 42, 11, 10, 9, 53, 50, 47 };
+    }
+
+    if (movement_index == 4) {
+        stickers_1 = { 27, 28, 29, 32, 35, 34, 33, 30 };
+        stickers_2 = { 2, 1, 0, 45, 48, 51, 15, 16, 17, 44, 41, 38 };
+    }
+
+    if (movement_index == 5) {
+        stickers_1 = { 36, 37, 38, 41, 44, 43, 42, 39 };
+        stickers_2 = { 8, 5, 2, 27, 30, 33, 17, 14, 11, 26, 23, 20 };
+    }
+
+    if (movement_index == 6) {
+        stickers_1 = { 45, 46, 47, 50, 53, 52, 51, 48 };
+        stickers_2 = { 0, 3, 6, 18, 21, 24, 9, 12, 15, 35, 32, 29 };
+    }
+
     movement_stickers(stickers, stickers_1, direction);
     movement_stickers(stickers, stickers_2, direction);
     
     //system("cls");
+    //std::cout << movement_index << std::endl;
     //print_stickers(stickers);
 }

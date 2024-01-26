@@ -33,6 +33,7 @@ void scroll_callback(GLFWwindow* window, double xoffset, double yoffset);
 void processInput(GLFWwindow* window);
 void RenderText(Shader& shader, std::string text, float x, float y, float scale, glm::vec3 color);
 
+
 // Holds all state information relevant to a character as loaded using FreeType
 struct Character {
     unsigned int TextureID; // ID handle of the glyph texture
@@ -266,6 +267,7 @@ int main(){
     int demo_mode = 0;
     int counter = 0;
     int help = 1;
+    int solved = 0;
     
     // RANDOM
     std::random_device rd;
@@ -370,6 +372,7 @@ int main(){
         RenderText(textShader, "Current speed: " + std::to_string(current_speed), 25.0f, 1000.0f, 0.5f, glm::vec3(0.5, 0.8f, 0.2f));
         RenderText(textShader, "Demo mode: " + std::to_string(demo_mode), 25.0f, 970.0f, 0.5f, glm::vec3(0.5, 0.8f, 0.2f));
         RenderText(textShader, "Moves: " + std::to_string(counter), 25.0f, 940.0f, 0.5f, glm::vec3(0.5, 0.8f, 0.2f));
+        //RenderText(textShader, "Solved: " + std::to_string(solved), 25.0f, 910.0f, 0.5f, glm::vec3(0.5, 0.8f, 0.2f));
         if (help == 1) {
             distance = 540;
             for (int i = 0; i < 14; i++){
