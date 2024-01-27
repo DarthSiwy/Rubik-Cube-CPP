@@ -7,14 +7,14 @@
 #include <cstdlib>
 
 // MOVEMENTS     U D F B R L 
-void movemment(int direction, int isTransitioning[], int cube_positions_index[], int cube_positions_index_previous[], int cube_positions_index_next[], const std::vector<int>& make_transitioning, std::vector<int>& indexes_to_change_A, std::vector<int>& indexes_to_change_B) {
+void movemment(int direction, int isTransitioning[], int cube_positions_index[], std::vector<int>& make_transitioning, std::vector<int>& indexes_to_change_A, std::vector<int>& indexes_to_change_B) {
     if (direction == -1) {
         std::reverse(indexes_to_change_A.begin(), indexes_to_change_A.end());
         std::reverse(indexes_to_change_B.begin(), indexes_to_change_B.end());
     }
     make_is_transtioning(isTransitioning, cube_positions_index, make_transitioning);
-    change_cube_postions_index(cube_positions_index_previous, cube_positions_index_next, cube_positions_index, indexes_to_change_A);
-    change_cube_postions_index(cube_positions_index_previous, cube_positions_index_next, cube_positions_index, indexes_to_change_B);
+    change_cube_postions_index(cube_positions_index, indexes_to_change_A);
+    change_cube_postions_index(cube_positions_index, indexes_to_change_B);
 }
 
 void speed(int gear, int &current_speed, float& speed_1, float& speed_2, int &animation) {
@@ -27,7 +27,7 @@ void speed(int gear, int &current_speed, float& speed_1, float& speed_2, int &an
     if (current_speed != 5) animation = 1;
 }
 
-void movements(int info, int animation, int direction, int stickers[36], int movement_index, float& rotationSpeed, int v, float& transitionProgress, float& angle_f, int& axis_of_rotation, int isTransitioning[], int cube_positions_index[], int cube_positions_index_previous[], int cube_positions_index_next[]){
+void movements(int info, int animation, int direction, int stickers[36], int movement_index, float& rotationSpeed, int v, float& transitionProgress, float& angle_f, int& axis_of_rotation, int isTransitioning[], int cube_positions_index[]){
     std::vector<int> make_transitioning = { 1, 7, 8, 9, 10, 19, 20, 21, 22 };
     std::vector<int> indexes_to_change_A = { 7,  10, 8,  9 };
     std::vector<int> indexes_to_change_B = { 19, 21, 22, 20 };
@@ -120,9 +120,9 @@ void movements(int info, int animation, int direction, int stickers[36], int mov
             if (direction == -1) std::cout << "p";
             std::cout << std::endl;
         }
-        movements(0, animation, 1 * direction, stickers, 5, rotationSpeed, 2, transitionProgress, angle_f, axis_of_rotation, isTransitioning, cube_positions_index, cube_positions_index_previous, cube_positions_index_next);
-        movements(0, animation,-1 * direction, stickers, 6, rotationSpeed, 2, transitionProgress, angle_f, axis_of_rotation, isTransitioning, cube_positions_index, cube_positions_index_previous, cube_positions_index_next);
-        movements(0, animation, 1 * direction, stickers, 9, rotationSpeed, 2, transitionProgress, angle_f, axis_of_rotation, isTransitioning, cube_positions_index, cube_positions_index_previous, cube_positions_index_next);
+        movements(0, animation, 1 * direction, stickers, 5, rotationSpeed, 2, transitionProgress, angle_f, axis_of_rotation, isTransitioning, cube_positions_index);
+        movements(0, animation,-1 * direction, stickers, 6, rotationSpeed, 2, transitionProgress, angle_f, axis_of_rotation, isTransitioning, cube_positions_index);
+        movements(0, animation, 1 * direction, stickers, 9, rotationSpeed, 2, transitionProgress, angle_f, axis_of_rotation, isTransitioning, cube_positions_index);
     }
 
     if (movement_index == 8) {
@@ -131,9 +131,9 @@ void movements(int info, int animation, int direction, int stickers[36], int mov
             if (direction == -1) std::cout << "p";
             std::cout << std::endl;
         }
-        movements(0, animation,-1 * direction, stickers, 1, rotationSpeed, 2, transitionProgress, angle_f, axis_of_rotation, isTransitioning, cube_positions_index, cube_positions_index_previous, cube_positions_index_next);
-        movements(0, animation, 1 * direction, stickers, 2, rotationSpeed, 2, transitionProgress, angle_f, axis_of_rotation, isTransitioning, cube_positions_index, cube_positions_index_previous, cube_positions_index_next);
-        movements(0, animation,-1 * direction, stickers,10, rotationSpeed, 2, transitionProgress, angle_f, axis_of_rotation, isTransitioning, cube_positions_index, cube_positions_index_previous, cube_positions_index_next); 
+        movements(0, animation,-1 * direction, stickers, 1, rotationSpeed, 2, transitionProgress, angle_f, axis_of_rotation, isTransitioning, cube_positions_index);
+        movements(0, animation, 1 * direction, stickers, 2, rotationSpeed, 2, transitionProgress, angle_f, axis_of_rotation, isTransitioning, cube_positions_index);
+        movements(0, animation,-1 * direction, stickers,10, rotationSpeed, 2, transitionProgress, angle_f, axis_of_rotation, isTransitioning, cube_positions_index); 
     }
 
     if (movement_index == 9) {
@@ -163,7 +163,7 @@ void movements(int info, int animation, int direction, int stickers[36], int mov
     }
         
     if (movement_index != 7 and movement_index != 8) {
-        movemment(direction, isTransitioning, cube_positions_index, cube_positions_index_previous, cube_positions_index_next, make_transitioning, indexes_to_change_A, indexes_to_change_B);
+        movemment(direction, isTransitioning, cube_positions_index, make_transitioning, indexes_to_change_A, indexes_to_change_B);
     }
            
     movement_stickers_select(stickers, movement_index, direction);

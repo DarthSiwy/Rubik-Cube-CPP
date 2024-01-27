@@ -77,6 +77,7 @@ int main(){
         return -1;
     }
     
+    // SHADER
     Shader mainShader("vertex_shader", "fragment_shader");
     Shader textShader("text_vertex_shader", "text_fragment_shader");
 
@@ -168,13 +169,13 @@ int main(){
     glEnableVertexAttribArray(2);
 
     // CUBES 
-    float vertices_main[288];
-    int cube_positions_index[27], cube_positions_index_previous[27], cube_positions_index_next[27];
+    int cube_positions_index[27];
     const int numCopies = 27, vertices_main_size = 288;
+    float vertices_main[288];
     float vertices[numCopies][vertices_main_size];
     
     make_vertices(vertices_main);
-    cube_indexes(cube_positions_index, cube_positions_index_previous, cube_positions_index_next, vertices, vertices_main);
+    cube_indexes(cube_positions_index, vertices, vertices_main);
     move_cubes(vertices, vertices_main);
     make_walls_black(vertices); 
 
@@ -373,14 +374,12 @@ int main(){
         RenderText(textShader, "Demo mode: " + std::to_string(demo_mode), 25.0f, 970.0f, 0.5f, glm::vec3(0.5, 0.8f, 0.2f));
         RenderText(textShader, "Moves: " + std::to_string(counter), 25.0f, 940.0f, 0.5f, glm::vec3(0.5, 0.8f, 0.2f));
         //RenderText(textShader, "Solved: " + std::to_string(solved), 25.0f, 910.0f, 0.5f, glm::vec3(0.5, 0.8f, 0.2f));
-        if (help == 1) {
-            distance = 540;
-            for (int i = 0; i < 14; i++){
-                distance -= 30.0f;
-                RenderText(textShader, text_vector[i], 25.0f, distance, 0.5f, glm::vec3(0.5, 0.8f, 0.2f));
-            }
+        distance = 540;
+        for (int i = 0; i < 15; i++) {
+            distance -= 30.0f;
+            if (help == 1)  RenderText(textShader, text_vector[i], 25.0f, distance, 0.5f, glm::vec3(0.5, 0.8f, 0.2f));
         }
-        RenderText(textShader, "H - HELP", 25.0f, 80.0f, 0.5f, glm::vec3(0.5, 0.8f, 0.2f));
+        RenderText(textShader, "H - HELP", 25.0f, distance - 40.0f, 0.5f, glm::vec3(0.5, 0.8f, 0.2f));
 
         // KEYBOARD STATE 
         int currentKeyState_W = glfwGetKey(window, GLFW_KEY_W);
@@ -430,7 +429,7 @@ int main(){
             if (currentKeyState_LEFT == GLFW_PRESS && previousKeyState_LEFT == GLFW_RELEASE)    move =10; 
 
             if (move > 0 && move < 7) counter++;
-            if (currentKeyState_M == GLFW_PRESS && previousKeyState_M == GLFW_RELEASE){
+            if (currentKeyState_M == GLFW_PRESS && previousKeyState_M == GLFW_RELEASE && demo_mode==0){
                 mixing = 1;
                 demo_mode = 0;
             }
@@ -445,7 +444,7 @@ int main(){
             }
             speed(1, current_speed, speed_1, speed_2, animation);
         }
-        if (currentKeyState_O == GLFW_PRESS && previousKeyState_O == GLFW_RELEASE && demo_mode==0) {
+        if (currentKeyState_O == GLFW_PRESS && previousKeyState_O == GLFW_RELEASE && demo_mode==0 && mixing==0) {
             if (demo_mode == 0) demo_mode = 1;
             previousKeyState_O = currentKeyState_O;
             counter = 0;
@@ -466,24 +465,23 @@ int main(){
         }
 
         // COUNTER RESET
-        if (currentKeyState_N == GLFW_PRESS && previousKeyState_N == GLFW_RELEASE && transitionProgress == 0.0f) {
+        if (currentKeyState_N == GLFW_PRESS && previousKeyState_N == GLFW_RELEASE && transitionProgress == 0.0f && demo_mode == 0) {
             counter = 0;
         }
         
         // CUBE RESET
-        if (currentKeyState_P == GLFW_PRESS && previousKeyState_P == GLFW_RELEASE && transitionProgress == 0.0f) {
+        if (currentKeyState_P == GLFW_PRESS && previousKeyState_P == GLFW_RELEASE && transitionProgress == 0.0f && demo_mode==0 && mixing==0) {
             move = 0;
-            demo_mode = 0;
             counter = 0;
             make_vertices(vertices_main);
-            cube_indexes(cube_positions_index, cube_positions_index_previous, cube_positions_index_next, vertices, vertices_main);
+            cube_indexes(cube_positions_index, vertices, vertices_main);
             move_cubes(vertices, vertices_main);
             make_walls_black(vertices);
             create_stickers(stickers);
         }
 
         // MIXING 
-        if (mixing == 1) {
+        if (mixing == 1 && demo_mode == 0) {
             std::uniform_int_distribution<int> distribution(1, 6);
             if (currentFrame - lastTaskTime_mixing >= 0.2f) {
                 if (transitionProgress == 0.0f){
@@ -503,14 +501,14 @@ int main(){
 
         if (move == 9)  {move = 7;  S = -1;}
         if (move == 10) {move = 8,  S = -1;}
-        if (move == 1)  movements(0, animation, 1 * S, stickers, move, rotationSpeed, 1, transitionProgress, angle_f, axis_of_rotation, isTransitioning, cube_positions_index, cube_positions_index_previous, cube_positions_index_next);
-        if (move == 2)  movements(0, animation, 1 * S, stickers, move, rotationSpeed, 1, transitionProgress, angle_f, axis_of_rotation, isTransitioning, cube_positions_index, cube_positions_index_previous, cube_positions_index_next);
-        if (move == 3)  movements(0, animation, 1 * S, stickers, move, rotationSpeed, 1, transitionProgress, angle_f, axis_of_rotation, isTransitioning, cube_positions_index, cube_positions_index_previous, cube_positions_index_next);
-        if (move == 4)  movements(0, animation, 1 * S, stickers, move, rotationSpeed, 1, transitionProgress, angle_f, axis_of_rotation, isTransitioning, cube_positions_index, cube_positions_index_previous, cube_positions_index_next);
-        if (move == 5)  movements(0, animation, 1 * S, stickers, move, rotationSpeed, 1, transitionProgress, angle_f, axis_of_rotation, isTransitioning, cube_positions_index, cube_positions_index_previous, cube_positions_index_next);
-        if (move == 6)  movements(0, animation, 1 * S, stickers, move, rotationSpeed, 1, transitionProgress, angle_f, axis_of_rotation, isTransitioning, cube_positions_index, cube_positions_index_previous, cube_positions_index_next);
-        if (move == 7)  movements(0, animation, 1 * S, stickers, move, rotationSpeed, 2, transitionProgress, angle_f, axis_of_rotation, isTransitioning, cube_positions_index, cube_positions_index_previous, cube_positions_index_next);
-        if (move == 8)  movements(0, animation, 1 * S, stickers, move, rotationSpeed, 2, transitionProgress, angle_f, axis_of_rotation, isTransitioning, cube_positions_index, cube_positions_index_previous, cube_positions_index_next);
+        if (move == 1)  movements(0, animation, 1 * S, stickers, move, rotationSpeed, 1, transitionProgress, angle_f, axis_of_rotation, isTransitioning, cube_positions_index);
+        if (move == 2)  movements(0, animation, 1 * S, stickers, move, rotationSpeed, 1, transitionProgress, angle_f, axis_of_rotation, isTransitioning, cube_positions_index);
+        if (move == 3)  movements(0, animation, 1 * S, stickers, move, rotationSpeed, 1, transitionProgress, angle_f, axis_of_rotation, isTransitioning, cube_positions_index);
+        if (move == 4)  movements(0, animation, 1 * S, stickers, move, rotationSpeed, 1, transitionProgress, angle_f, axis_of_rotation, isTransitioning, cube_positions_index);
+        if (move == 5)  movements(0, animation, 1 * S, stickers, move, rotationSpeed, 1, transitionProgress, angle_f, axis_of_rotation, isTransitioning, cube_positions_index);
+        if (move == 6)  movements(0, animation, 1 * S, stickers, move, rotationSpeed, 1, transitionProgress, angle_f, axis_of_rotation, isTransitioning, cube_positions_index);
+        if (move == 7)  movements(0, animation, 1 * S, stickers, move, rotationSpeed, 2, transitionProgress, angle_f, axis_of_rotation, isTransitioning, cube_positions_index);
+        if (move == 8)  movements(0, animation, 1 * S, stickers, move, rotationSpeed, 2, transitionProgress, angle_f, axis_of_rotation, isTransitioning, cube_positions_index);
 
         // SPACE LOOK
         if (currentKeyState_Space == GLFW_PRESS && previousKeyState_Space == GLFW_RELEASE && look_position == 0) {

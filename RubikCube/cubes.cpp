@@ -172,15 +172,11 @@ void move_cubes(float vertices[][288], float vertices_main[288]) {
     }
 }
 
-void cube_indexes(int cube_positions_index[], int cube_positions_index_previous[], int cube_positions_index_next[], float vertices[27][288], float vertices_main[288]) {
+void cube_indexes(int cube_positions_index[], float vertices[27][288], float vertices_main[288]) {
     for (int i = 0; i < 27; ++i) {
         for (int j = 0; j < 288; ++j) {
             vertices[i][j] = vertices_main[j];
-            //vertices_previous[i][j] = vertices_main[j];
-            //vertices_next[i][j] = vertices_main[j];
         }
         cube_positions_index[i] = i;
-        cube_positions_index_previous[i] = i;
-        cube_positions_index_next[i] = i;
     }
 }

@@ -9,6 +9,7 @@ void make_text_vector_help(std::vector<std::string>& text_vector) {
     text_vector.push_back("D - RIGHT");
     text_vector.push_back("R - BACK");
     text_vector.push_back("F - DOWN");
+    text_vector.push_back("+LSHIFT DIRECTION");
     text_vector.push_back("1-5 - SPEED");
     text_vector.push_back("O - DEMO MODE");
     text_vector.push_back("P - RESET");
