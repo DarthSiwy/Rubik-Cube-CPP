@@ -30,6 +30,8 @@ A simple C++ program using OpenGL to create a 3D representation of a Rubik's Cub
 - R - BACK
 - F - DOWN
 
+- +LSHIFT change move direction
+
 - ARROWS - rotate entire cube
 - 1-5 - change speed
 - SPACE - change view
